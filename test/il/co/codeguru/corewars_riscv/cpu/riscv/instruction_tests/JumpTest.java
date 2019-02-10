@@ -73,9 +73,9 @@ public class JumpTest {
 
     @Test
     @Parameters({
-            " 0, 8, 0, 8, 4",
-            "12,-8, 0, 4,16",
-            "12,-8,16,20,16"
+            " 0, 8, 0,    8, 4",
+            "12,32, 0,   32,16",
+            "12,32,16,   48,16"
     })
     public void testJalr(int initialPc, int reg, int imm, int expectedPc, int expectedReg) throws MemoryException, CpuException {
         state.setReg(RS1_INDEX, reg);

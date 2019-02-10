@@ -20,6 +20,10 @@ public final class RV32C {
         return new CInstructionFormatCSS((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rs2, (byte) imm);
     }
 
+    public static CInstructionFormatCSS cInstructionFormatCSSwithWord(Instruction.InstructionInfo info, int rs2, int imm) {
+        return CInstructionFormatCSS.createWithWord((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)rs2, (byte) imm);
+    }
+
     public static CInstructionFormatCIW cInstructionFormatCIW(Instruction.InstructionInfo info, int rd, int imm) {
         assert rd >= 8 && rd < 16;
         return new CInstructionFormatCIW((byte)info.getOpcode(), (byte)info.getFunct3(), (byte)(rd-8), (byte)imm);

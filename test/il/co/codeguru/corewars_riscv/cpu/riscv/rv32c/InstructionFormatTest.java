@@ -85,6 +85,16 @@ public class InstructionFormatTest {
     }
 
     @Test
+    public void testCssCreateFromWord()
+    {
+        CInstructionFormatCSS css = CInstructionFormatCSS.createWithWord((byte)0,(byte)0,(byte)0,(byte)0);
+        assertEquals((short)0, css.getRaw());
+
+        css = CInstructionFormatCSS.createWithWord((byte)2, (byte)6, (byte)5, (byte)20);
+        assertEquals((short)0xCA16, css.getRaw());
+    }
+
+    @Test
     public void testCiw()
     {
         CInstructionFormatCIW ciw = new CInstructionFormatCIW((short)0);

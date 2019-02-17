@@ -254,13 +254,12 @@ public class InstructionRunner {
      * Register x0 can be used as the destination if the result is not required
      */
     public void jalr(InstructionFormatI i) {
-        state.setReg(i.getRd(), state.getPc() + 4);
-        jump(state, state.getReg(i.getRs1()) + i.getImmediate());
+       this.jalr(i, 4);
     }
 
     public void jalr(InstructionFormatI i, int instructionSize) {
         state.setReg(i.getRd(), state.getPc() + instructionSize);
-        jump(state, state.getReg(i.getRs1()) + i.getImmediate(), instructionSize);
+        state.setPc(state.getReg(i.getRs1()) + i.getImmediate() - instructionSize);
     }
 
     /**

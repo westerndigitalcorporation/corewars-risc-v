@@ -187,21 +187,22 @@ public class InstructionTest {
     public void testSwsp() throws MemoryException, CpuException {
         state.setReg(RS1, VAL);
         state.setReg(2, 15);
-        loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 0));
+        loadInstruction(RV32C.cInstructionFormatCSSwithWord(RV32C.Opcodes.CSWSP, RS1, 0));
         cpu.nextOpcode();
         assertEquals(VAL, memory.loadWord(15));
 
         state.setReg(RS1, VAL);
         state.setReg(2, 15);
-        loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, 20));
+        loadInstruction(RV32C.cInstructionFormatCSSwithWord(RV32C.Opcodes.CSWSP, RS1, 20));
         cpu.nextOpcode();
         assertEquals(VAL, memory.loadWord(35));
 
         state.setReg(RS1, VAL);
         state.setReg(2, 0);
-        loadInstruction(RV32C.cInstructionFormatCSS(RV32C.Opcodes.CSWSP, RS1, -15));
+        // 252 is the largest offset that can be in SWSP
+        loadInstruction(RV32C.cInstructionFormatCSSwithWord(RV32C.Opcodes.CSWSP, RS1, 252));
         cpu.nextOpcode();
-        assertNotEquals(VAL, memory.loadWord((-15) & 0xFFFF));
+        assertEquals(VAL, memory.loadWord(252));
     }
 
     @Test

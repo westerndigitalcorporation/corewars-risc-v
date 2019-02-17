@@ -65,7 +65,7 @@ public class StoreTest {
         state.setReg(RS2_INDEX, VAL);
         loadInstruction(RV32I.instructionS(RV32I.Opcodes.Sh, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(VAL, memory.loadWord(expectedAddress));
+        assertEquals(VAL, memory.loadHalfWord(expectedAddress));
     }
 
     @Test
@@ -79,6 +79,6 @@ public class StoreTest {
         state.setReg(RS2_INDEX, VAL);
         loadInstruction(RV32I.instructionS(RV32I.Opcodes.Sb, RS1_INDEX, RS2_INDEX, imm));
         cpu.nextOpcode();
-        assertEquals(VAL, memory.loadWord(expectedAddress));
+        assertEquals(VAL, memory.loadByte(expectedAddress));
     }
 }

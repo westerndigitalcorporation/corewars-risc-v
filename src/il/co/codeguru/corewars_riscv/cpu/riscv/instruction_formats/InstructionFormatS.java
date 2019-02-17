@@ -22,8 +22,9 @@ public class InstructionFormatS extends InstructionFormatBase
                         ((funct3 & mask(3)) << 12) |
                         ((rs1 & mask(5)) << 15) |
                         ((rs2 & mask(5)) << 20) |
-                        (((imm >> 5) & mask(7) << 25))
+                        ((((imm >> 5) & mask(7)) << 25))
         );
+
     }
 
     @Override
@@ -47,9 +48,11 @@ public class InstructionFormatS extends InstructionFormatBase
         return (byte)((this.raw >> 20) & mask(5));
     }
 
-    public byte getImm() {
+    public short getImm() {
         int first_part = (byte)((this.raw >> 7) & mask(5));
-        int second_part = (byte)(this.raw >> 25);
-        return (byte)(first_part | (second_part << 5));
+        int second_part = (byte)((this.raw >> 25) & mask(7));
+        // Sign-extend the result
+        int shift = 32 - 12;
+        return (short)((first_part | (second_part << 5)) << shift >> shift);
     }
 }

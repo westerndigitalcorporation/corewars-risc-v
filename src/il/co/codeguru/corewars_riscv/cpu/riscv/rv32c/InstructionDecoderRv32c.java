@@ -312,10 +312,8 @@ public class InstructionDecoderRv32c {
                          * It expands to "sw rs2, offset[7:2](x2)".
                          */
                         CInstructionFormatCSS css = new CInstructionFormatCSS(i);
-                        int cssbit76 = css.getImmediate() & 3;
-                        int cssbit52 = (css.getImmediate() >> 2) & 15;
-                        int cssuimm = (cssbit52 | (cssbit76 << 4)) << 2;
-                        return new Instruction(RV32C.Opcodes.CSWSP, RV32I.instructionS(RV32I.Opcodes.Sw, 2, css.getRs2(), cssuimm),
+
+                        return new Instruction(RV32C.Opcodes.CSWSP, RV32I.instructionS(RV32I.Opcodes.Sw, 2, css.getRs2(), css.getWord()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.sw(new InstructionFormatS(format)));
                 }
         }

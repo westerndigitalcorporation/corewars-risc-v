@@ -7,16 +7,15 @@ import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.*;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats.*;
 
 public class InstructionDecoderRv32c {
+
     public Instruction decode(CInstructionFormatBase i) {
         CInstructionFormatCI ci = new CInstructionFormatCI(i);
         CInstructionFormatCS cs = new CInstructionFormatCS(i);
         CInstructionFormatCB cb = new CInstructionFormatCB(i);
-        switch(i.getOpcode())
-        {
+        switch (i.getOpcode()) {
             case RV32C.OpcodeTypes.C0:
                 CInstructionFormatCIW ciw = new CInstructionFormatCIW(i);
-                switch(i.getFunct3())
-                {
+                switch (i.getFunct3()) {
                     case 0:
                         /*
                          * C.ADDI4SPN is a CIW-format instruction that adds a zero-extended
@@ -25,14 +24,13 @@ public class InstructionDecoderRv32c {
                          * to generate pointers to stack-allocated variables, and expands to
                          * "addi rd, x2, nzuimm[9:2]".
                          */
-                        if(ciw.getImmediate() == 0)
-                        {
+                        if (ciw.getImmediate() == 0) {
                             return null;
                         }
                         int bit3 = ciw.getImmediate() & 1;
                         int bit2 = (ciw.getImmediate() >> 1) & 1;
-                        int bit96= (ciw.getImmediate() >> 2) & 15;
-                        int bit54= (ciw.getImmediate() >> 6) & 3;
+                        int bit96 = (ciw.getImmediate() >> 2) & 15;
+                        int bit54 = (ciw.getImmediate() >> 6) & 3;
                         int nzuimm = (bit2 | (bit3 << 1) | (bit54 << 2) | (bit96 << 4)) << 2;
                         return new Instruction(RV32C.Opcodes.CADDI4SPN, RV32I.instructionI(RV32I.Opcodes.Addi, ciw.getRd(), 2, nzuimm),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
@@ -56,14 +54,12 @@ public class InstructionDecoderRv32c {
                         return new Instruction(RV32C.Opcodes.CSW, RV32I.instructionS(RV32I.Opcodes.Sw, cs.getRs1(), cs.getRs2(), cs.getImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.sw(new InstructionFormatS(format)));
                 }
-                
+
             case RV32C.OpcodeTypes.C1:
                 CInstructionFormatCJ cj = new CInstructionFormatCJ(i);
-                switch(i.getFunct3())
-                {
+                switch (i.getFunct3()) {
                     case 0:
-                        if(ci.getRs1() != 0)
-                        {
+                        if (ci.getRs1() != 0) {
                             /*
                              * C.ADDI adds the non-zero sign-extended 6-bit immediate to the value in
                              * register rd then writes the result to rd.  C.ADDI expands
@@ -73,7 +69,7 @@ public class InstructionDecoderRv32c {
                             return new Instruction(RV32C.Opcodes.CADDI, RV32I.instructionI(RV32I.Opcodes.Addi, ci.getRs1(), ci.getRs1(), ci.getImmediate()),
                                     (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
                         }
-                        
+
                     case 1:
                         /*
                          * C.JAL is an RV32C-only instruction that performs the same operation as C.J,
@@ -91,8 +87,7 @@ public class InstructionDecoderRv32c {
                         return new Instruction(RV32C.Opcodes.CLI, RV32I.instructionI(RV32I.Opcodes.Addi, ci.getRs1(), 0, ci.getImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
                     case 3:
-                        if(ci.getRs1() == 2)
-                        {
+                        if (ci.getRs1() == 2) {
                             /*
                              * C.ADDI16SP shares the opcode with C.LUI, but has a destination field
                              * of x2. C.ADDI16SP adds the non-zero sign-extended 6-bit immediate to
@@ -101,17 +96,17 @@ public class InstructionDecoderRv32c {
                              * (-512,496). C.ADDI16SP is used to adjust the stack pointer in procedure
                              * prologues and epilogues.  It expands into "addi x2, x2, nzimm[9:4]".
                              */
-                            int bit5 = (ci.getImmediate() >> 2) & 1;
-                            int bit78 = (ci.getImmediate() >> 3) & 2;
-                            int bit6 = (ci.getImmediate() >> 5) & 1;
-                            int bit4 = (ci.getImmediate() >> 6) & 1;
-                            int bit9 = (ci.getImmediate() >> 7) & 1;
-                            int nzimm = (bit4 & (bit5 << 1) & (bit6 << 2) & (bit78 << 3) & (bit9 << 4)) << 4;
-                            return new Instruction(RV32C.Opcodes.CADDI16SP, RV32I.instructionI(RV32I.Opcodes.Addi, 2,2, nzimm),
+                            byte imm = ci.getImmediate();
+                            int bit5 = imm & 1;
+                            int bits78 = (imm >> 1) & 3;
+                            int bit6 = (imm >> 3) & 1;
+                            int bit4 = (imm >> 4) & 1;
+                            int bit9 = (imm >> 5) & 1;
+                            int nzimm = (bit4 | (bit5 << 1) | (bit6 << 2) | (bits78 << 3) | (bit9 << 5)) << 4;
+
+                            return new Instruction(RV32C.Opcodes.CADDI16SP, RV32I.instructionI(RV32I.Opcodes.Addi, 2, 2, nzimm),
                                     (InstructionFormatBase format, InstructionRunner runner) -> runner.addi(new InstructionFormatI(format)));
-                        }
-                        else if (ci.getRs1() != 0)
-                        {
+                        } else if (ci.getRs1() != 0) {
                             /*
                              * C.LUI loads the non-zero 6-bit immediate field into bits 17--12 of the
                              * destination register, clears the bottom 12 bits, and sign-extends bit
@@ -123,12 +118,10 @@ public class InstructionDecoderRv32c {
                             return new Instruction(RV32C.Opcodes.CLUI, RV32I.instructionU(RV32I.Opcodes.Lui, ci.getRs1(), ci.getImmediate()),
                                     (InstructionFormatBase format, InstructionRunner runner) -> runner.lui(new InstructionFormatU(format)));
                         }
-                        
+
                     case 4:
-                        if(cb.getFunct2() != 3)
-                        {
-                            switch(cb.getFunct2())
-                            {
+                        if (cb.getFunct2() != 3) {
+                            switch (cb.getFunct2()) {
                                 case 0:
                                     /*
                                      * C.SRLI is a CB-format instruction that performs a logical right shift
@@ -162,11 +155,8 @@ public class InstructionDecoderRv32c {
                                     return new Instruction(RV32C.Opcodes.CANDI, RV32I.instructionI(RV32I.Opcodes.Andi, cb.getRs1(), cb.getRs1(), cb.getImmediate()),
                                             (InstructionFormatBase format, InstructionRunner runner) -> runner.andi(new InstructionFormatI(format)));
                             }
-                        }
-                        else if(((cs.getFunct6() >> 2) & 1) == 0)
-                        {
-                            switch(cs.getFunct2())
-                            {
+                        } else if (((cs.getFunct6() >> 2) & 1) == 0) {
+                            switch (cs.getFunct2()) {
                                 case 0:
                                     /*
                                      * C.SUB subtracts the value in register rs2 from the value in
@@ -200,7 +190,7 @@ public class InstructionDecoderRv32c {
                                     return new Instruction(RV32C.Opcodes.CAND, RV32I.instructionR(RV32I.Opcodes.And, cs.getRs1(), cs.getRs1(), cs.getRs2()),
                                             (InstructionFormatBase format, InstructionRunner runner) -> runner.and(new InstructionFormatR(format)));
                             }
-                            
+
                         }
                     case 5:
                         /*
@@ -227,10 +217,9 @@ public class InstructionDecoderRv32c {
                         return new Instruction(RV32C.Opcodes.CBNEZ, RV32I.instructionSB(RV32I.Opcodes.Bne, cb.getRs1(), 0, cb.getBranchImmediate()),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.bne(new InstructionFormatSB(format), 2));
                 }
-                
+
             case RV32C.OpcodeTypes.C2:
-                switch(i.getFunct3())
-                {
+                switch (i.getFunct3()) {
                     case 0:
                         /*
                          * C.SLLI is a CI-format instruction that performs a logical left shift
@@ -253,15 +242,14 @@ public class InstructionDecoderRv32c {
                          */
                         int bit76 = ci.getUnsignedImmediate() & 3;
                         int bit42 = (ci.getUnsignedImmediate() >> 2) & 7;
-                        int bit5  = (ci.getUnsignedImmediate() >> 5) & 1;
+                        int bit5 = (ci.getUnsignedImmediate() >> 5) & 1;
                         int uimm = (bit42 | (bit5 << 3) | (bit76 << 4)) << 2;
                         return new Instruction(RV32C.Opcodes.CLWSP, RV32I.instructionI(RV32I.Opcodes.Lw, ci.getRs1(), 2, uimm),
                                 (InstructionFormatBase format, InstructionRunner runner) -> runner.lw(new InstructionFormatI(format)));
                     case 4:
                         CInstructionFormatCR cr = new CInstructionFormatCR(i);
-                        if((cr.getFunct4() & 1) == 1)
-                        {
-                            if(cr.getRs1() != 0 && cr.getRs2() != 0) //c.add
+                        if ((cr.getFunct4() & 1) == 1) {
+                            if (cr.getRs1() != 0 && cr.getRs2() != 0) //c.add
                             {
                                 /*
                                  * C.ADD adds the values in registers rd and rs2 and writes the
@@ -269,9 +257,7 @@ public class InstructionDecoderRv32c {
                                  */
                                 return new Instruction(RV32C.Opcodes.CADD, RV32I.instructionR(RV32I.Opcodes.Add, cr.getRs1(), cr.getRs1(), cr.getRs2()),
                                         (InstructionFormatBase format, InstructionRunner runner) -> runner.add(new InstructionFormatR(format)));
-                            }
-                            else if(cr.getRs1() != 0 && cr.getRs2() == 0)
-                            {
+                            } else if (cr.getRs1() != 0 && cr.getRs2() == 0) {
                                 /*
                                  * C.JALR (jump and link register) performs the same operation as C.JR,
                                  * but additionally writes the address of the instruction following the
@@ -281,20 +267,15 @@ public class InstructionDecoderRv32c {
                                 return new Instruction(RV32C.Opcodes.CJALR, RV32I.instructionI(RV32I.Opcodes.Jalr, 1, cr.getRs1(), 0),
                                         (InstructionFormatBase format, InstructionRunner runner) -> runner.jalr(new InstructionFormatI(format), 2));
                             }
-                        }
-                        else
-                        {
-                            if(cr.getRs1() != 0 && cr.getRs2() != 0)
-                            {
+                        } else {
+                            if (cr.getRs1() != 0 && cr.getRs2() != 0) {
                                 /*
                                  * C.MV copies the value in register rs2 into register rd. C.MV
                                  * expands into "add rd, x0, rs2".
                                  */
                                 return new Instruction(RV32C.Opcodes.CMV, RV32I.instructionR(RV32I.Opcodes.Add, cr.getRs1(), 0, cr.getRs2()),
                                         (InstructionFormatBase format, InstructionRunner runner) -> runner.add(new InstructionFormatR(format)));
-                            }
-                            else if(cr.getRs1() != 0 && cr.getRs2() == 0)
-                            {
+                            } else if (cr.getRs1() != 0 && cr.getRs2() == 0) {
                                 /*
                                  * C.JR (jump register) performs an unconditional control transfer to
                                  * the address in register rs1.  C.JR expands to "jalr x0, 0(rs1)".
@@ -303,7 +284,7 @@ public class InstructionDecoderRv32c {
                                         (InstructionFormatBase format, InstructionRunner runner) -> runner.jalr(new InstructionFormatI(format), 2));
                             }
                         }
-                        
+
                     case 6:
                         /*
                          * C.SWSP stores a 32-bit value in register rs2 to memory.  It computes

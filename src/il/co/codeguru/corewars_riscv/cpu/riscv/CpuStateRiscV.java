@@ -27,6 +27,6 @@ public class CpuStateRiscV {
     }
 
     public void setPc(int pc) {
-        this.pc = pc;
+        this.pc = pc % 0x10000;
     }
 }

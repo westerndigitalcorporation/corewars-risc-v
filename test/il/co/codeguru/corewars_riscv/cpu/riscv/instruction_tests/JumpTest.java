@@ -97,7 +97,7 @@ public class JumpTest {
             "12,32, 0,   32,16",
             "12,32,16,   48,16"
     })
-    public void testJalrSameSrcDst()(int initialPc, int reg, int imm, int expectedPc, int expectedReg) throws MemoryException, CpuException {
+    public void testJalrSameSrcDst(int initialPc, int reg, int imm, int expectedPc, int expectedReg) throws MemoryException, CpuException {
         state.setReg(RD_INDEX, reg);
         state.setPc(initialPc);
         loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD_INDEX, RD_INDEX, imm));

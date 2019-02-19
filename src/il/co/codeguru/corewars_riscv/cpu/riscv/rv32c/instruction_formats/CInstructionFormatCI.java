@@ -24,8 +24,11 @@ public class CInstructionFormatCI extends CInstructionFormatBase {
 
     public byte getImmediate()
     {
-        byte base = (byte)((((raw >> 12) & 1) << 5) | ((raw >> 2) & mask(5)));
-        return  (byte)((base & 0x20) == 0x20 ? base | (mask(2) << 6) : base);
+        byte extraImm = (byte) ((raw >> 12) & 1);
+        byte base = (byte)((extraImm << 5) | ((raw >> 2) & mask(5)));
+        return  (byte)(extraImm != 0
+                ? base | (mask(2) << 6) // Why is this here?
+                : base);
     }
 
     public byte getUnsignedImmediate()

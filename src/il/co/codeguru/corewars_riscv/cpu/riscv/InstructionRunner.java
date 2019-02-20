@@ -238,8 +238,7 @@ public class InstructionRunner {
      * JAL stores the address of the instruction following the jump (pc+4) into register rd.
      */
     public void jal(InstructionFormatUJ i) {
-        state.setReg(i.getRd(), state.getPc() + 4);
-        jump(state, i.getImmediate());
+        jal(i, 4);
     }
 
     public void jal(InstructionFormatUJ i, int instructionSize) {
@@ -258,8 +257,9 @@ public class InstructionRunner {
     }
 
     public void jalr(InstructionFormatI i, int instructionSize) {
-        state.setReg(i.getRd(), state.getPc() + instructionSize);
+        int tmpPc = state.getPc();
         state.setPc(state.getReg(i.getRs1()) + i.getImmediate() - instructionSize);
+        state.setReg(i.getRd(), tmpPc + instructionSize);
     }
 
     /**

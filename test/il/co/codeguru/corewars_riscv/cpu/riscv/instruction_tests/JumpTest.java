@@ -85,6 +85,26 @@ public class JumpTest {
         assertEquals(expectedPc, state.getPc());
         assertEquals(expectedReg, state.getReg(RD_INDEX));
     }
+    
+    
+    /*
+     * Test for the case where jalr is called with the source register and destination register are the same
+     * such as <code>jalr x3, x3</code>
+     */
+    @Test
+    @Parameters({
+            " 0, 8, 0,    8, 4",
+            "12,32, 0,   32,16",
+            "12,32,16,   48,16"
+    })
+    public void testJalrSameSrcDst(int initialPc, int reg, int imm, int expectedPc, int expectedReg) throws MemoryException, CpuException {
+        state.setReg(RD_INDEX, reg);
+        state.setPc(initialPc);
+        loadInstruction(RV32I.instructionI(RV32I.Opcodes.Jalr, RD_INDEX, RD_INDEX, imm));
+        cpu.nextOpcode();
+        assertEquals(expectedPc, state.getPc());
+        assertEquals(expectedReg, state.getReg(RD_INDEX));
+    }
 
     /*
      * As of RV32C, jumps no longer throw a misaligned memory load exception when reaching an address that

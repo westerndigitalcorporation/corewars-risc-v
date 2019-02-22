@@ -30,8 +30,8 @@
   </target>
 
   <target name="libs" depends="resolve" description="Copy libs to WEB-INF/lib">
-    <mkdir dir="war/WEB-INF/lib" />
-    <copy todir="war/WEB-INF/lib" flatten="true">
+    <mkdir dir="${output.dir}/WEB-INF/lib" />
+    <copy todir="${output.dir}/WEB-INF/lib" flatten="true">
       <path refid="provided.path"/>
     </copy>
   </target>
@@ -51,6 +51,22 @@
     </copy>
   </target>
 
+  <target name="console" depends="libs" description="Compile java source to console application">
+    <mkdir dir="console"/>
+    <mkdir dir="console/build"/>
+    <javac srcdir="src" includes="**" encoding="utf-8"
+           destdir="console/build"
+           source="8" target="8" nowarn="true"
+           debug="true" debuglevel="lines,vars,source">
+      <classpath>
+        <path refid="compile.path"/>
+      </classpath>
+    </javac>
+    <jar destfile="console/corewars-risc-v.jar" basedir="console/build" manifest="console.mf">
+
+    </jar>
+  </target>
+
   <target name="gwtc" depends="javac" description="GWT compile to JavaScript (production mode)">
     <java failonerror="true" fork="true" classname="com.google.gwt.dev.Compiler" maxmemory="512m">
       <classpath>
@@ -58,7 +74,7 @@
         <path refid="compile.path"/>
       </classpath>
       <arg line="-war"/>
-      <arg value="war"/>
+      <arg value="${output.dir}"/>
       <arg line="${gwt.args}"/>
       <arg value="com.codewars_js"/>
 
@@ -80,7 +96,7 @@
       <arg value="-startupUrl"/>
       <arg value="page.html"/>
       <arg line="-war"/>
-      <arg value="war"/>
+      <arg value="${output.dir}"/>
       <arg line="${gwt.args}"/>
       <arg value="com.codewars_js"/>
 
@@ -164,7 +180,7 @@
 
   <target name="clean" description="Cleans this project">
     <delete dir="${class.dir}" failonerror="false" />
-    <delete dir="war/codewars_js" failonerror="false" />
+    <delete dir="${output.dir}/codewars_js" failonerror="false" />
   </target>
 
 

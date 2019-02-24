@@ -9,6 +9,15 @@ body {
     font-family: Verdana;
 }
 
+a {
+    height: fit-content;
+    width: fit-content;
+}
+
+.hide {
+    display: none !important;
+}
+
 .sc-btn {
   display: inline-block;
   /*position: absolute;*/
@@ -581,7 +590,6 @@ input:disabled + .sc-btn:active,
 #editor_title {
     height: 30px;
     width: 300px;
-    margin: 6px 0 20px 0;
     font-size: 20px;
     border-radius: 5px;
     padding: 0 0 0 10px;
@@ -1025,7 +1033,6 @@ input:disabled + .sc-btn:active,
     background-position: 2px 3px;
     height: 34px;
     width: 46px;
-    position: absolute;
     border-radius: 5px;
 }
 #uploadBinBut:active {
@@ -1040,9 +1047,7 @@ input:disabled + .sc-btn:active,
     background-position: 8px 3px;
     height: 34px;
     width: 33px;
-    position: absolute;
     border-radius: 5px;
-    right: 0;
 }
 #aboutBtn:active {
     background-position: 9px 4px;
@@ -1050,7 +1055,8 @@ input:disabled + .sc-btn:active,
     background-repeat: repeat, no-repeat;
 }
 .popupBack {
-    display: none;
+    visibility: hidden;
+    opacity: 0;
     position: absolute;
     width: 100%;
     height: 100%;
@@ -1059,6 +1065,12 @@ input:disabled + .sc-btn:active,
     left: 0;
     z-index: 1; /* above the export button which is an appended child */
 }
+
+.popupBack:target {
+    visibility: visible;
+    opacity: 1;
+}
+
 .popupWin {
     position: absolute;
     width: 600px;
@@ -1155,4 +1167,18 @@ h3 {
     overflow: hidden;
     position: relative;
     width: 709px;
+}
+
+
+#top-bar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#settingsBtn {
+    height: fit-content;
+    width: fit-content;
+    padding: 8.5px;
+    text-decoration: none;
 }

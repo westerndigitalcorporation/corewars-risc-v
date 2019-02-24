@@ -26,7 +26,7 @@ nasm memory leak
    errors with dy 12, dz 12
 
 check randomization similarity with real java
-  https://github.com/tomer-schles/corewars8086-seed-bugfix/commits/master
+  https://github.com/tomer-schles/corewars_riscv-seed-bugfix/commits/master
 
 --------------------------------
 
@@ -72,7 +72,7 @@ debugger
 
 - check changes:
     https://forum.codeguru.co.il/wp/?topic=silenterrors-debugger
-    https://github.com/YoavKa/corewars8086/releases/tag/v5
+    https://github.com/YoavKa/corewars_riscv/releases/tag/v5
 
 - cpu view can change values, show in red and is able to revert?
 

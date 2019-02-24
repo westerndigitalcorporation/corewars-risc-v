@@ -3,8 +3,8 @@ package com.client;
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
 
-import il.co.codeguru.corewars8086.CoreWarsEngine;
-import il.co.codeguru.corewars8086.gui.widgets.Console;
+import il.co.codeguru.corewars_riscv.CoreWarsEngine;
+import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.

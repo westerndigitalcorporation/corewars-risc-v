@@ -6,10 +6,12 @@
     <title>CodeWars8086</title>
 
     <link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
 
     <script type="text/javascript" language="javascript" src="gas_riscv_js.js"></script>
     <script type="text/javascript" language="javascript" src="codewars_js/codewars_js.nocache.js"></script>
     <script type="text/javascript" language="javascript" src="main.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 </head>
 
 <body onload="start()">
@@ -22,11 +24,13 @@
             </div>
 
             <div id="edit_panel">
-                <input type="text" id="editor_title" spellcheck="false">
-                <input id="uploadBinInput" type="file" class="hidden" onchange="return triggerUploadBinChanged()">
-                <label id="uploadBinBut" class="sc-btn" for="uploadBinInput" title="Upload binary file"></label>
-                <label id="aboutBtn" class="sc-btn" title="About" onclick="triggerAbout(true)"></label>
-
+                <div id="top-bar">
+                    <input type="text" id="editor_title" spellcheck="false">
+                    <input id="uploadBinInput" type="file" class="hidden" onchange="return triggerUploadBinChanged()">
+                    <label id="uploadBinBut" class="sc-btn" for="uploadBinInput" title="Upload binary file"></label>
+                    <a id="aboutBtn" class="sc-btn" title="About" href="#about"></a>
+                    <a href="#settings" id="settingsBtn" class="fas fa-cog sc-btn"></a>
+                </div>
                 <br>
                 <div id="editor_boxes">
                     <div id="edit_area">
@@ -145,67 +149,8 @@
                     <span class="reg_name">x31:</span><input type="text" id="reg_31" class="reg_input" maxlength="9"
                         spellcheck="false"><br>
                     <span class="reg_name">PC:</span><input type="text" id="reg_PC" class="reg_input" maxlength="9"
-                        spellcheck="false">
-                    <span class="reg_name reg_long_name">Energy:</span><input type="text" id="reg_Energy" class="reg_input"
-                        maxlength="9" spellcheck="false">
-                    <span class="reg_name reg_long_name">Flags:</span><input type="text" id="reg_Flags" class="reg_input"
-                        maxlength="9" spellcheck="false"><br>
-                    <table id="reg_flags_table" cellspacing="0">
-                        <tr>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td title="Overflow Flag">OF</td>
-                            <td title="Direction Flag">DF</td>
-                            <td title="Interrupt Enable Flag">IF</td>
-                            <td title="Trap Flag">TF</td>
-                            <td class="bytesep" title="Sign Flag">SF</td>
-                            <td title="Zero Flag">ZF</td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td title="Adjust Flag">AF</td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td title="Parity Flag">PF</td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td title="Carry Flag">CF</td>
-                        </tr>
-                        <tr>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="OF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="OF_fcheck" title="Overflow Flag"></label></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="DF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="DF_fcheck" title="Direction Flag"></label></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="IF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="IF_fcheck" title="Interrupt Enable Flag"></label></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="TF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="TF_fcheck" title="Trap Flag"></label></td>
-                            <td class="bytesep">
-                                <input class="flag_check_box hidden mycheck" id="SF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="SF_fcheck" title="Sign Flag"></label></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="ZF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="ZF_fcheck" title="Zero Flag"></label></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="AF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="AF_fcheck" title="Adjust Flag"></label></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="PF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="PF_fcheck" title="Parity Flag"></label></td>
-                            <td class="flag_unsed" title="Reserved"></td>
-                            <td>
-                                <input class="flag_check_box hidden mycheck" id="CF_fcheck" type="checkbox">
-                                <label class="flag_check mycheck_label" for="CF_fcheck" title="Carry Flag"></label></td>
-                        </tr>
-                    </table>
+                        spellcheck="false"><br>
+                    
                     <div id="stackArea" class="submem_area">
                         <div class="submem_title">Stack</div>
                         <div class="submem_box_addr"></div>
@@ -282,18 +227,25 @@
 
     </div>
 
-    <div id="aboutBack" class="popupBack" onclick="triggerAbout(false)">
-        <div id="aboutWin" class="popupWin">
+    <div id="about" class="popupBack" onclick="hidePopup(event);">
+        <div id="about-win" class="popupWin">
             <h1>codewars8086_js</h1><br>
             <h2>Javascript GUI, integrated editor and debugger: Shy Shalom<br>
                 <h2>Original codeguru emulator: Danny Leshem<br>
                     <h3>If you find a bug open a new issue in:<br>
-                        <a href="https://github.com/shooshx/corewars8086_js/issues" target="_blank">https://github.com/shooshx/corewars8086_js/issues</a><br>
+                        <a href="https://github.com/shooshx/corewars_riscv_js/issues" target="_blank">https://github.com/shooshx/corewars_riscv_js/issues</a><br>
                         Or email to:<br>
                         <a href="mailto:shooshx@gmail.com" target="_blank">shooshx@gmail.com</a><br>
                         <h3>
         </div>
     </div>
+
+    <div id="settings" class="popupBack" onclick="hidePopup(event);">
+            <div class="popupWin">
+                <input type="checkbox" id="new-memory">
+                Enable new memory mode
+            </div>
+        </div>
 
 </body>
 

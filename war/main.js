@@ -37,38 +37,17 @@ function start()
     if (did_start)
         return;
     console.log("start()");
-    //run_nasm = Module.cwrap('run_nasm', null, ['string', 'string'])
     run_gas = Module.cwrap('run_gas', null, ['string', 'string'])
-    //Module['print'] = printConsole
-    //Module['printErr'] = printConsole
 
     asm_edit.addEventListener("keydown", fixhscroll)
     asm_edit.addEventListener("keydown", fixTabKey) // want to capture the press since we want to prevent the default action
     asm_edit.addEventListener("keyup", fixhscroll)
     asm_edit.addEventListener("keyup", fixIndent)  // indent is on key up since we want it after the \n
 
-    // asm_pre.addEventListener("mousewheel", asm_pre_mousewheel) not working
-
     populate_debug_area()
     did_start = true
 
-    document.addEventListener("selectionchange", function() {
-    //    var s = document.getSelection();
-    //    var r = s.getRangeAt(0)
-    //    console.log('Selection changed ' + (selcount++) + "  " + s.rangeCount + " " + r.startContainer.id + ":" + r.startOffset + " - " + r.endContainer.id + ":" + r.endOffset  );
-
-    /*    if (asm_edit.selectionStart == 2) {
-            asm_edit.selectionStart = 3;
-            console.log("moved")
-        }*/
-
-    });
-
     setup_breakpoints_savers()
-
-    speedSlider.addEventListener("input", function() {
-        //speedSliderVal.innerText = speedSlider.value
-    })
 }
 
 
@@ -579,6 +558,7 @@ function triggerDebug() {
             var uz = g_usedZnums[uzi]
             document.getElementById("player_erase_z" + uz).setAttribute("disabled", true)
         }
+        $('#settingsBtn').addClass('hide');
     }
     else {
         j_stopDebug()
@@ -604,7 +584,7 @@ function triggerDebug() {
             var uz = g_usedZnums[uzi]
             document.getElementById("player_erase_z" + uz).removeAttribute("disabled")
         }
-
+        $('#settingsBtn').removeClass('hide');
     }
 }
 
@@ -734,7 +714,7 @@ function addWatchLine() {
     grip.addEventListener('mousedown', function(e) {
         moving = true;
         startOffset = watch_expr_list[0].offsetWidth - e.pageX;
-        //console.log("CAPTURE")
+        //consolelog("CAPTURE")
     });
 
 
@@ -745,7 +725,6 @@ function addWatchLine() {
               watch_expr_list[elemi].style.width = watch_expr_size + 'px';
           e.preventDefault(); // prevent selection action from messing it up
 
-          //console.log(watch_expr_size + "  " + watchArea.offsetWidth - 30)
           if (watch_expr_size > watchArea.offsetWidth - 50)
               watchArea.style.overflowX = "auto"
           else
@@ -755,7 +734,6 @@ function addWatchLine() {
 
     document.addEventListener('mouseup', function() {
         moving = false;
-        //console.log("-release")
     });
 
 }
@@ -1012,14 +990,7 @@ function competeFinished()
 function eventStopProp(e) {
     e.stopPropagation()
 }
-function triggerAbout(v, ev) {
-    aboutBtn.checked = v
-    if (v) {
-        aboutBack.style.display = "inline"
-    }
-    else {
-        aboutBack.style.display = "none"
-    }
-
-    aboutWin.onclick = eventStopProp
+function hidePopup(event) {
+    if($(event.target).closest('.popupWin').length == 0)
+        window.location.replace('#');
 }

@@ -33,4 +33,8 @@ public class Logger {
         if(getInstance().testing) System.err.println(message);
         else Console.error(message);
     }
+
+    public static void setTestingMode() {
+        getInstance().testing = true;
+    }
 }

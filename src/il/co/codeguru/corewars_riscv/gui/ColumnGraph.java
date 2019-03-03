@@ -1,10 +1,5 @@
 package il.co.codeguru.corewars_riscv.gui;
 
-//import java.awt.Color;
-//import java.awt.Dimension;
-//import java.awt.Graphics;
-//
-//import javax.swing.JComponent;
 import elemental2.dom.CanvasRenderingContext2D;
 import elemental2.dom.HTMLCanvasElement;
 import il.co.codeguru.corewars_riscv.gui.widgets.*;
@@ -13,7 +8,6 @@ import il.co.codeguru.corewars_riscv.gui.widgets.*;
  * @author BS
  */
 public class ColumnGraph extends JComponent<HTMLCanvasElement> {
-	private static final long serialVersionUID = 1L;
 
     static class PlayerColumn {
         public String name;
@@ -85,12 +79,14 @@ public class ColumnGraph extends JComponent<HTMLCanvasElement> {
         repaint();
 
         StringBuilder sb = new StringBuilder();
-        for(int i = 0; i < columns.length; ++i) {
-            sb.append(columns[i].values[0]);
+        for (PlayerColumn column : columns) {
+            sb.append(column.values[0]);
             sb.append("  ");
         }
-        Console.log("Score add " + Integer.toString(pos) + " " + Integer.toString(subIndex) + " " + Float.toString(value) +
+        Console.log("Score add " + pos + " " + subIndex + " " + value +
                     "  totals= " + sb.toString());
+
+
         paintComponent();
     }
 

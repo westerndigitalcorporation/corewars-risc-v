@@ -34,7 +34,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
     private static final String SEED_PREFIX = "SEED#";
 	private JTextField seed;
 
-    private boolean m_isStartPaused = false;
+    private boolean isInDebug = false;
 
     CodeEditor m_codeEditor;
     public PlayersPanel m_playersPanel;
@@ -128,9 +128,10 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 
     public boolean j_startDebug()
     {
+        Logger.log("j_startDebug");
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        return gui_runWar(true, true);
+        return gui_runWar( true);
     }
 
     public void j_stopDebug()
@@ -143,7 +144,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
     {
         if (!m_playersPanel.checkPlayersReady())
             return false;
-        return gui_runWar(false, false);
+        return gui_runWar( false);
     }
     public void j_stopCompete()
     {
@@ -162,14 +163,14 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 
     private AnimationScheduler.AnimationCallback animCallback = timestamp -> {
         try {
-            callContinueRun();
+            startRunAnimation();
         } catch (Exception e) {
             Console.log("continueRun EXCEPTION " + e.toString());
             e.printStackTrace();
         }
     };
 
-    private void callContinueRun() throws Exception {
+    private void startRunAnimation() throws Exception {
         boolean needMore = competition.continueRun();
         outRoundNum();
         if (needMore)
@@ -188,21 +189,16 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
      */
     public boolean runWar(boolean isInDebug)
     {
-        int battlesPerGroup = 0;
-        try {
-            long seedValue;
-            if (seed.getText().startsWith(SEED_PREFIX)){
-                seedValue = Long.parseLong(seed.getText().substring(SEED_PREFIX.length()));
-            }
-            else {
-                seedValue = seed.getText().hashCode();
-            }
-            competition.setSeed(seedValue);
-            battlesPerGroup = 0; // in case parseInt fails
-            battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
-        } catch (NumberFormatException e2) {
-            JOptionPane.showMessageDialog(this, "Error in configuration");
+        long seedValue;
+        if (seed.getText().startsWith(SEED_PREFIX)){
+            seedValue = Long.parseLong(seed.getText().substring(SEED_PREFIX.length()));
         }
+        else {
+            seedValue = seed.getText().hashCode();
+        }
+        competition.setSeed(seedValue);
+
+        int battlesPerGroup = Integer.parseInt(battlesPerGroupField.getText().trim());
 
         // having numItems and groupSize allows having 4 players and running competitions of just any 3 of them
         // this is hardly useful in reality so I just set it to the same size
@@ -218,7 +214,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
                 .toArray(PlayersPanel.Code[]::new);
         if (!repo.loadWarriors(playerFiles , m_playersPanel.getZombies(), isInDebug))
             return false;
-        columnGraph.clear(repo.getGroupNames());
+        clear(repo.getGroupNames());
 
         int numOfGroups = repo.getNumberOfGroups();
         if (numOfGroups == 0) {
@@ -227,14 +223,13 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         }
 
         try {
-            competition.runCompetition(battlesPerGroup, numOfGroups, m_isStartPaused, isBattleShown(), SettingsPanel.useNewMemory());
-            callContinueRun(); // when runWar() returns we want the War object to be already constructured and ready
-            if (isBattleShown()) { // add breakpointchecked only if we're in debugger
+            competition.runCompetition(battlesPerGroup, numOfGroups, isInDebug, SettingsPanel.useNewMemory());
+            startRunAnimation(); // when runWar() returns we want the War object to be already constructured and ready
+            if (this.isInDebug) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();
                 war.setBreakpointCheck(m_codeEditor);
                 Warrior inEditorWarrior = war.getWarriorByLabel(m_playersPanel.getCodeInEditor().getLabel());
                 war.setUiWarrior(inEditorWarrior);
-                war.setInDebugger();
             }
             return true;
         }
@@ -247,9 +242,19 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         return false;
     }
 
+    public native void clear(String[] names) /*-{
+        $wnd.competitionGraph.clear(names);
+    }-*/;
+
     public void scoreChanged(String name, float addedValue, int groupIndex, int subIndex) {
-        columnGraph.addToValue(groupIndex, subIndex, addedValue);
+        //columnGraph.addToValue(groupIndex, subIndex, addedValue);
+        addToValue(name, subIndex, addedValue);
+
     }
+
+    public native void addToValue(String name, int subIndex, float addedValue) /*-{
+        $wnd.competitionGraph.addToValue(name, subIndex, addedValue);
+    }-*/;
 
     private void setDebugMode(boolean v) {
         m_codeEditor.setDebugMode(v);
@@ -260,15 +265,12 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
             battleFrame.warCanvas.revokeWar();
     }
 
-    public boolean gui_runWar(Boolean isBattleShown, Boolean isStartPaused) {
-        if (isBattleShown != null)
-            m_isBattleShown = isBattleShown;
-        if (isStartPaused != null)
-            m_isStartPaused = isStartPaused;
-        if (runWar(isBattleShown)) {
+    public boolean gui_runWar(boolean inDebug) {
+        m_isBattleShown = inDebug;
+        isInDebug = inDebug;
+        if (runWar(inDebug)) {
             competitionRunning = true;
-            //runWarButton.setEnabled(false);
-            if (isBattleShown)
+            if (inDebug)
                 setDebugMode(true);
 
             stepnum.innerHTML = "0";

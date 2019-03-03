@@ -1,6 +1,5 @@
 package il.co.codeguru.corewars_riscv.war;
 
-import java.text.MessageFormat;
 import java.util.*;
 
 import il.co.codeguru.corewars_riscv.gui.FixedLoadAddressChecker;
@@ -71,13 +70,34 @@ public class WarriorRepository {
     //TODO: Make this class not singleton
     static FixedLoadAddressChecker m_Fixed_loadAddressChecker;
 
+    private boolean loadZombies(PlayersPanel.Code[] zombieFiles, FixedLoadAddressChecker fixedLoadAddressChecker) {
+        zombieGroup = null;
+        if (zombieFiles == null || zombieFiles.length == 0)
+            return true;
+
+        zombieGroup = new WarriorGroup("ZoMbIeS");
+        for (PlayersPanel.Code c : zombieFiles) {
+            if (!validateWarrior(c, "zombie")) return false;
+
+            int startAddress = -1;
+            if (!c.startAddrRandom) {
+                startAddress = fixedLoadAddressChecker.addCheck(c.startAddress, c.bin.length, c.getName());
+                if (startAddress == -2)
+                    return false;
+            }
+
+            WarriorData data = new WarriorData(c.getName(), truncToSize(c.getBin()), c.getLabel(), startAddress);
+            zombieGroup.addWarrior(data);
+        }
+        return true;
+    }
 
     public boolean loadWarriors(PlayersPanel.Code[] files, PlayersPanel.Code[] zombies, boolean isInDebug)
     {
         warriorNameToGroup.clear();
         warriorGroups.clear();
 
-        Logger.log("Found " + Integer.toString(files.length) + " survivors, " + Integer.toString(zombies.length) + " zombies");
+        Logger.log("Found " + files.length + " survivors, " + zombies.length + " zombies");
         m_Fixed_loadAddressChecker = null; // reset it before potentially being used again
 
         Arrays.sort(files, (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
@@ -100,7 +120,7 @@ public class WarriorRepository {
             return false;
         }
 
-        if (!readZombiesFromUI(zombies, m_Fixed_loadAddressChecker))
+        if (!loadZombies(zombies, m_Fixed_loadAddressChecker))
             return false;
 
         return true;
@@ -133,27 +153,7 @@ public class WarriorRepository {
     }
 
 
-    private boolean readZombiesFromUI(PlayersPanel.Code[] zombieFiles, FixedLoadAddressChecker fixedLoadAddressChecker) {
-        zombieGroup = null;
-        if (zombieFiles == null || zombieFiles.length == 0)
-            return true;
 
-        zombieGroup = new WarriorGroup("ZoMbIeS");
-        for (PlayersPanel.Code c : zombieFiles) {
-            if (!validateWarrior(c, "zombie")) return false;
-
-            int startAddress = -1;
-            if (!c.startAddrRandom) {
-                startAddress = fixedLoadAddressChecker.addCheck(c.startAddress, c.bin.length, c.getName());
-                if (startAddress == -2)
-                    return false;
-            }
-
-            WarriorData data = new WarriorData(c.getName(), truncToSize(c.getBin()), c.getLabel(), startAddress);
-            zombieGroup.addWarrior(data);
-        }
-        return true;
-    }
 
     /**
      * @return the warrior groups corresponding to a given list of indices, and

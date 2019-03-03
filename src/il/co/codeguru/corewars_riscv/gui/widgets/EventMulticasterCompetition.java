@@ -1,5 +1,6 @@
 package il.co.codeguru.corewars_riscv.gui.widgets;
 
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.CompetitionEventListener;
 import il.co.codeguru.corewars_riscv.war.Warrior;
 

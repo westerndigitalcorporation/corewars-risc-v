@@ -9,3 +9,4 @@ jacoco.prod.exec
 .sonar/
 war/codewars_js
 www-test/
+console/

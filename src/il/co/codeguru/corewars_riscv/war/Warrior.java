@@ -64,6 +64,12 @@ public class Warrior
         m_isAlive = true;		
     }
 
+    // Quick and dirty hack for creating a seam for unit testing
+    public void setCpu(CpuRiscV cpu)
+    {
+        m_cpu = cpu;
+    }
+
     /**
      * @return whether or not the warrior is still alive.
      */
@@ -123,9 +129,8 @@ public class Warrior
         m_cpu.nextOpcode();
         if(m_cpu.getState().getPc() >= ARENA_SIZE || m_cpu.getState().getPc() < 0)
         {
-            throw new MemoryException();
+            throw new MemoryException("Warrior " + m_name + " tried to execute instructions outside of the arena");
         }
-
     }
 
     /**

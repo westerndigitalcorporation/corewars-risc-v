@@ -1,6 +1,5 @@
 package il.co.codeguru.corewars_riscv.war;
 
-import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.gui.widgets.EventMulticasterCompetition;
 import il.co.codeguru.corewars_riscv.gui.widgets.EventMulticasterMemory;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
@@ -24,7 +23,7 @@ public class Competition {
 
     private War currentWar;
 
-    private int warsPerCombination= 20;
+    private int warsPerCombination = 20;
 
 
     private int speed;  // while debugging. 0 means 1 step each frame, >0 means how many steps to make each frame, <0 means how many frames to skip between steps
@@ -35,14 +34,7 @@ public class Competition {
 
     // continue state between animation frames
     public static class CompState {
-        public enum State {
-            NONE,
-            RUN_WAR,
-            RUN_ROUND
-        } 
-        public State state = State.NONE; 
         int warIndex = 0;
-        boolean startPaused;
         boolean isInDebugger; // should we return after each round or after each war for a UI update. also activates breakpoints
         public int round;
         public boolean abort = false;
@@ -74,55 +66,40 @@ public class Competition {
     private void doneCompetition() {
         competitionEventListener.onCompetitionEnd();
         long elapsed = System.currentTimeMillis() - compState.startTime;
-        Console.log("Total time=" + elapsed / 1000.0);
+        Logger.log("Total time=" + elapsed / 1000.0);
         compState = null;
     }
 
     // return true if need to continue after
     public boolean continueRun() throws Exception
     {
-        if (globalPause)
+        if (globalPause) {
+            Logger.log("globalPause");
             return false;
+        }
         if (compState.abort) {
-            Console.log("Abort");
+            Logger.log("Abort");
             doneWar();
             doneCompetition();
             return false;
         }
-        if (compState.state == CompState.State.RUN_WAR)
+        if (currentWar == null)
         {
             if (compState.warIndex < warsPerCombination) 
             {
-                startWar( warriorRepository.createGroupList(competitionIterator.next()) );
-                compState.state = CompState.State.RUN_ROUND;
-                boolean wasStartPaused = compState.startPaused;
-                compState.startPaused = false; // start paused only applies to the first war
-                return !wasStartPaused;
+                startWar( warriorRepository.createGroupList(competitionIterator.next()));
+                return !compState.isInDebugger;
             }
             else {
                 doneCompetition();
                 return false;
             }
         }
-        else if (compState.state == CompState.State.RUN_ROUND)
+        else
         {
             int needMore = 1;
             if (compState.isInDebugger) {
-                int stepsCount = 1;
-                if (!currentWar.isSingleRound()) { // speed doesn't do anyhthing when clicking single step
-                    if (speed > 1)
-                        stepsCount = speed;
-                    else if (speed < 0) {
-                        if (compState.waitedFrames > 0) {
-                            --compState.waitedFrames;
-                            stepsCount = 0;
-                        }
-                        else { // == 0
-                            compState.waitedFrames = -speed;
-                            stepsCount = 1;
-                        }
-                    }
-                }
+                int stepsCount = calculateSpeed();
                 if (stepsCount > 0) {
                     switchToCompete();
                     while (needMore == 1 && stepsCount > 1) {
@@ -154,30 +131,29 @@ public class Competition {
                 // when in debugger, we want to have the ability to continue stepping in a stopped war to see how it goes
                 // and it doesn't make sense any way to start a new war
                 if (!compState.isInDebugger) {
-                    compState.state = CompState.State.RUN_WAR;
+                    currentWar = null;
                     return true;
                 }
                 return false;
             }
             return true; // what's left is that it's equal to 1
         }
-        return false;
     }
 
-    public void runCompetition(int warsPerCombination, int warriorsPerGroup, boolean startPaused, boolean isInDebugger, boolean useNewMemory) throws Exception
-    {
+
+
+    public void runCompetition(int warsPerCombination, int warriorsPerGroup, boolean isInDebugger, boolean useNewMemory) {
         this.warsPerCombination = warsPerCombination;
         Logger.log("Running competition");
         competitionIterator = new CompetitionIterator(warriorRepository.getNumberOfGroups(), warriorsPerGroup, seed);
 
         // run on every possible combination of warrior groups
         competitionEventListener.onCompetitionStart();
-        Console.log("runCompetition " + warsPerCombination + " wars");
+        Logger.log("runCompetition " + warsPerCombination + " wars");
 
         compState = new CompState();
         compState.warIndex = 0;
-        compState.state = CompState.State.RUN_WAR;
-        compState.startPaused = startPaused;
+        currentWar = null;
         compState.isInDebugger = isInDebugger;
         compState.startTime = System.currentTimeMillis();
         compState.useNewMemory = useNewMemory;
@@ -226,10 +202,9 @@ public class Competition {
         return 1;
     }
 
-    // return true if needs another round
     private void startWar(WarriorGroup[] warriorGroups) throws Exception
     {
-        currentWar = new War(memoryEventListener, competitionEventListener, compState.startPaused, compState.useNewMemory);
+        currentWar = new War(memoryEventListener, competitionEventListener, compState.isInDebugger, compState.useNewMemory);
         currentWar.setSeed(this.seed);
         competitionEventListener.onWarPreStartClear();
         currentWar.loadWarriorGroups(warriorGroups);
@@ -271,6 +246,24 @@ public class Competition {
             return -1;
         }
     }
+    private int calculateSpeed() {
+        int stepsCount = 1;
+        if (!currentWar.isSingleRound()) { // speed doesn't do anyhthing when clicking single step
+            if (speed > 1)
+                stepsCount = speed;
+            else if (speed < 0) {
+                if (compState.waitedFrames > 0) {
+                    --compState.waitedFrames;
+                    stepsCount = 0;
+                }
+                else { // == 0
+                    compState.waitedFrames = -speed;
+                }
+            }
+        }
+        return stepsCount;
+    }
+
 
     public void addCompetitionEventListener(CompetitionEventListener lis) {
         competitionEventCaster.add(lis);

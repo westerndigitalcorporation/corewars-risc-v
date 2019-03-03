@@ -17,7 +17,7 @@ public class Logger {
     private Logger() {
     }
 
-    public static void setTestingMode()
+    public static void outputToStdout()
     {
         getInstance().testing = true;
     }

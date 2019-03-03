@@ -7,6 +7,8 @@ package il.co.codeguru.corewars_riscv.war;
  */
 public class WarriorData {
 
+    public static final int RANDOM_LOAD_ADDRESS = -1;
+
     /**
      * Constructor.
      * @param name   Warrior's name.

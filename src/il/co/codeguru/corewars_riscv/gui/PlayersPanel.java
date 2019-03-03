@@ -7,6 +7,7 @@ import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars_riscv.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 
 import java.util.ArrayList;
 
@@ -94,10 +95,9 @@ public class PlayersPanel
     public native void exportMethods() /*-{
         var that = this
         $wnd.j_srcSelectionChanged = $entry(function(s,i) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_srcSelectionChanged(Ljava/lang/String;I)(s,i) });
-        $wnd.j_addPlayer =    $entry(function(a,b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_addPlayer(Ljava/lang/String;Ljava/lang/String;)(a,b) });
+        $wnd.j_addPlayer =    $entry(function(a,b,c,d,e) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_addPlayer(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/Boolean;)(a,b,c,d,e) });
         $wnd.j_removePlayer = $entry(function(s) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_removePlayer(Ljava/lang/String;)(s) });
         $wnd.j_changedWType = $entry(function(a,b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_changedWType(Ljava/lang/String;Ljava/lang/String;)(a,b) });
-        $wnd.j_demoDebugPlayers = $entry(function() { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_demoDebugPlayers()() });
         $wnd.j_loadAddrChanged = $entry(function(s,b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_loadAddrChanged(Ljava/lang/String;Z)(s,b) });
         $wnd.j_loadBinary      = $entry(function(b) { that.@il.co.codeguru.corewars_riscv.gui.PlayersPanel::j_loadBinary(Lcom/google/gwt/typedarrays/shared/ArrayBuffer;)(b) });
     }-*/;
@@ -120,69 +120,8 @@ public class PlayersPanel
         return pi.code[ci];
     }
 
-    public native void addPlayerPanel() /*-{
-        $wnd.addPlayersPanel();
-    }-*/;
-    public native void changedWType(String label, String v) /*-{
-        $wnd.changedWType(label, v, true);
-    }-*/;
-
-
-    public static String blindRanger =
-            "# Technique - Blind Ranger\n" +
-            "loop:\n" +
-            "add x2, x2, 750\n" +
-            "add x3, x1, x2\n" +
-            "sw x2, 32(x3)\n" +
-            "j loop\n";
-
-    public static String blindWarrior =
-            "# Technique - Blind Knight\n" +
-            "loop:\n" +
-            "add x2, x2, 4\n" +
-            "add x3, x1, x2\n" +
-            "sw x2, 32(x3)\n" +
-            "j loop\n";
-
-    public static String still =
-            "# Technieque - Stand Still\n" +
-            "j x1\n";
-
-
-    private void demo_like_original() {
-        addPlayerPanel(); // this demo has 4 players. initialization of the page adds 2 panels
-
-        m_inEditor = m_players.get(1).code[0];
-        m_inEditor.asmText = still;
-        m_inEditor.player.wtype = EWarriorType.SINGLE;
-        updateTitle("Still");
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-
-        m_inEditor = m_players.get(2).code[0];
-        m_inEditor.asmText = blindWarrior;
-        m_inEditor.player.wtype = EWarriorType.SINGLE;
-        updateTitle("Warrior");
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-
-        // the one that is selected at the end
-        m_inEditor = m_players.get(0).code[0];
-        updateTitle("Ranger");
-        m_inEditor.asmText = blindRanger;
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-        m_inEditor = m_players.get(0).code[1];
-        m_inEditor.asmText = blindRanger;
-        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
-        m_inEditor.player.wtype = EWarriorType.TWO_DIFFERENT;
-        changedWType(m_inEditor.player.label, "TWO_DIFFERENT");
-    }
-
-    public void j_demoDebugPlayers() {
-        demo_like_original();
-    }
-
-
     // from js
-    public void j_addPlayer(String label, String title) {
+    public void j_addPlayer(String label, String title, String code1, String code2, Boolean wtype) {
         if (label == null)
             return;
         if (findPlayer(label) != null)
@@ -191,6 +130,15 @@ public class PlayersPanel
         String tu = title.replace(' ', '_');
         p.code[0].name = tu + "1";
         p.code[1].name = tu + "2";
+        p.code[0].asmText = code1;
+        p.code[1].asmText = code2;
+        p.wtype = wtype ? EWarriorType.TWO_DIFFERENT : EWarriorType.SINGLE;
+        m_inEditor = p.code[0];
+        m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
+        if(p.wtype == EWarriorType.TWO_DIFFERENT) {
+            m_inEditor = p.code[1];
+            m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, this);
+        }
         m_players.add(p);
         Console.log("Added " + label + " " + m_players.size());
     }
@@ -220,11 +168,8 @@ public class PlayersPanel
     // from js
     // called by button press and also at the very beginning
     public void j_srcSelectionChanged(String playerLabel, int num) {
-        //Console.log("~~~~" + label + Integer.toString(num));
-
         PlayerInfo p = findPlayer(playerLabel);
         m_inEditor = null;
-        assert p != null: "did not find player with label " + playerLabel;
 
         m_inEditor = p.code[num - 1];
         m_mainWnd.m_codeEditor.playerSelectionChanged(m_inEditor, null); // don't pass playerPanel since we don't want it to return update to us

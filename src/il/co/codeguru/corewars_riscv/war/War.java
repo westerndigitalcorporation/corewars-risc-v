@@ -63,7 +63,6 @@ public class War {
 
     private IBreakpointCheck m_breakpointCheck = null;
     private int m_uiWarriorIndex = -1; // break in breakpoints only of this warrior (he's the one selected in the PlayersPanel)
-    private boolean m_inDebugger = false; // controls the end condition
     private boolean m_hasEnded = false; // this war has ended but the object remains alive for post-mortem examination
     private boolean useNewMemory;
 
@@ -75,9 +74,6 @@ public class War {
     }
     public void setBreakpointCheck(IBreakpointCheck brc) {
         m_breakpointCheck = brc;
-    }
-    public void setInDebugger() {
-        m_inDebugger = true;
     }
     public boolean hasEnded() {
         return m_hasEnded;
@@ -146,7 +142,7 @@ public class War {
                 }
                 catch (MemoryException e) {
                     if(m_warListener != null)
-                        m_warListener.onWarriorDeath(warrior, "RawMemory exception: " + e.getMessage());
+                        m_warListener.onWarriorDeath(warrior, "Memory exception: " + e.getMessage());
                     warrior.kill();
                     warrior.getCpuState().setPc(savedIp);
                     --m_numWarriorsAlive;
@@ -349,7 +345,6 @@ public class War {
             if (WarriorRepository.m_Fixed_loadAddressChecker != null) {
                 if (!WarriorRepository.m_Fixed_loadAddressChecker.checkOverlap(loadAddress, warriorSize)) {
                     found = false;
-                    Logger.log("overlap with fixed!");
                     continue;
                 }
             }
@@ -365,14 +360,13 @@ public class War {
 
                 if ((loadAddress+warriorSize >= otherStart) && (loadAddress < otherEnd)) {
                     found = false;
-                    Logger.log("overlap with loaded!");
                     break;
                 }
             }
         }
 
         if (!found) {
-            throw new Exception();
+            throw new RuntimeException("Too many players - not enough space in the memory left to spawn all warriors");
         }
 
         return (short)loadAddress;

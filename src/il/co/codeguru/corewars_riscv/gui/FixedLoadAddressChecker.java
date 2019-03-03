@@ -32,7 +32,7 @@ public class FixedLoadAddressChecker {
             return -2;
         }
         if (startAddress > 0xffff - len + 1) {
-            Logger.error("Player " + name + " fixed start address does not leave enough space for code (" + Integer.toString(len) + " bytes)");
+            Logger.error("Player " + name + " fixed start address does not leave enough space for code (" + len + " bytes)");
             return -2;
         }
         AddressRange r = new AddressRange(name, startAddress, startAddress + len - 1); // both ends of the range are inclusive

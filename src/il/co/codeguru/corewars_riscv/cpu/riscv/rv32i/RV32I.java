@@ -1,6 +1,7 @@
-package il.co.codeguru.corewars_riscv.cpu.riscv;
+package il.co.codeguru.corewars_riscv.cpu.riscv.rv32i;
 
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.*;
+import il.co.codeguru.corewars_riscv.cpu.riscv.Instruction;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.*;
 
 public final class RV32I {
     private RV32I(){}

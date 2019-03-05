@@ -2,17 +2,16 @@ package il.co.codeguru.corewars_riscv.utils.disassembler;
 
 import il.co.codeguru.corewars_riscv.cpu.exceptions.InvalidOpcodeException;
 import il.co.codeguru.corewars_riscv.cpu.riscv.Instruction;
-import il.co.codeguru.corewars_riscv.cpu.riscv.InstructionDecoder;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.InstructionDecoder32I;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.RawMemory;
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.InstructionDecoderRv32c;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
-import il.co.codeguru.corewars_riscv.utils.Logger;
 
 public class DisassemblerRiscV implements IDisassembler {
 
-    private InstructionDecoder decoder;
+    private InstructionDecoder32I decoder;
     private InstructionDecoderRv32c cDecoder;
 
     private Memory Memory;
@@ -25,7 +24,7 @@ public class DisassemblerRiscV implements IDisassembler {
         this.index = index;
         this.endIndex = endIndex;
 
-        this.decoder = new InstructionDecoder();
+        this.decoder = new InstructionDecoder32I();
         this.cDecoder= new InstructionDecoderRv32c();
     }
 

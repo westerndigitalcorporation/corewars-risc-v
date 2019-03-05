@@ -1,15 +1,17 @@
-package il.co.codeguru.corewars_riscv.cpu.riscv;
+package il.co.codeguru.corewars_riscv.cpu.riscv.rv32i;
 
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.*;
+import il.co.codeguru.corewars_riscv.cpu.riscv.CpuRiscV;
+import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.*;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
 
-public class InstructionRunner {
+public class InstructionRunner32I {
 
     private CpuStateRiscV state;
     private Memory memory;
 
-    public InstructionRunner(CpuRiscV cpu) {
+    public InstructionRunner32I(CpuRiscV cpu) {
         this.state = cpu.getState();
         this.memory = cpu.getMemory();
     }

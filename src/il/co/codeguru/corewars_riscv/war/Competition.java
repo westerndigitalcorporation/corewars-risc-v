@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars_riscv.war;
 
+import il.co.codeguru.corewars_riscv.features.Feature;
+import il.co.codeguru.corewars_riscv.features.FeatureSet;
 import il.co.codeguru.corewars_riscv.gui.widgets.EventMulticasterCompetition;
 import il.co.codeguru.corewars_riscv.gui.widgets.EventMulticasterMemory;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
@@ -41,6 +43,7 @@ public class Competition {
         int waitedFrames = 0; // how many frames we just waited for negative speed
         long startTime = 0;
         boolean useNewMemory;
+        Feature[] features;
     }
     public CompState compState;
 
@@ -142,7 +145,7 @@ public class Competition {
 
 
 
-    public void runCompetition(int warsPerCombination, int warriorsPerGroup, boolean isInDebugger, boolean useNewMemory) {
+    public void runCompetition(int warsPerCombination, int warriorsPerGroup, boolean isInDebugger, boolean useNewMemory, Feature[] features) {
         this.warsPerCombination = warsPerCombination;
         Logger.log("Running competition");
         competitionIterator = new CompetitionIterator(warriorRepository.getNumberOfGroups(), warriorsPerGroup, seed);
@@ -157,6 +160,7 @@ public class Competition {
         compState.isInDebugger = isInDebugger;
         compState.startTime = System.currentTimeMillis();
         compState.useNewMemory = useNewMemory;
+        compState.features = features;
 
         if (isInDebugger)
             switchToDebug();
@@ -204,7 +208,7 @@ public class Competition {
 
     private void startWar(WarriorGroup[] warriorGroups) throws Exception
     {
-        currentWar = new War(memoryEventListener, competitionEventListener, compState.isInDebugger, compState.useNewMemory);
+        currentWar = new War(memoryEventListener, competitionEventListener, compState.isInDebugger, compState.useNewMemory, compState.features);
         currentWar.setSeed(this.seed);
         competitionEventListener.onWarPreStartClear();
         currentWar.loadWarriorGroups(warriorGroups);

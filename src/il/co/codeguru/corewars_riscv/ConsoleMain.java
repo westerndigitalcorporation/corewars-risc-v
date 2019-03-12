@@ -1,5 +1,7 @@
 package il.co.codeguru.corewars_riscv;
 
+import il.co.codeguru.corewars_riscv.features.Feature;
+import il.co.codeguru.corewars_riscv.features.FeatureSet;
 import il.co.codeguru.corewars_riscv.gui.PlayersPanel;
 import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.Competition;
@@ -10,6 +12,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 public class ConsoleMain {
@@ -40,9 +43,6 @@ public class ConsoleMain {
             System.out.println(group.getName() + ":" + group.getGroupScore());
         }
 
-        System.out.println("Working Directory = " +
-                System.getProperty("user.dir"));
-
         outputRepoToFile(
                 competition.getWarriorRepository(),
                 config.getProperty("OUTPUT_FILE")
@@ -61,11 +61,17 @@ public class ConsoleMain {
         );
         if(!ok) throw new RuntimeException("Failed to load warriors");
 
+        FeatureSet features = FeatureSet.getAllFeatures();
+        features.getRegisterdFeatures().stream()
+                .filter(e -> config.getProperty(e.getKey(), "false").equals("true"))
+                .forEach(e -> e.getValue().enable());
+
         competition.runCompetition(
                 100,
                 competition.getWarriorRepository().getNumberOfGroups(),
                 false,
-                config.getProperty("NEW_MEMORY", "false").equals("true")
+                config.getProperty("NEW_MEMORY", "false").equals("true"),
+                features.getEnabledFeatures()
         );
         return competition;
     }
@@ -141,7 +147,7 @@ public class ConsoleMain {
         try {
             is = new FileInputStream(filename);
         } catch (FileNotFoundException ex) {
-            System.out.println("WARNING: Config not found!");
+            System.err.println("WARNING: Config not found!");
             return config;
         }
         try {

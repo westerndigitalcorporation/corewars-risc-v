@@ -1,6 +1,8 @@
 package il.co.codeguru.corewars_riscv.war;
 
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
+import il.co.codeguru.corewars_riscv.features.Feature;
+import il.co.codeguru.corewars_riscv.features.FeatureSet;
 import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.gui.IBreakpointCheck;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
@@ -40,6 +42,8 @@ public class War {
     private final static int MAX_LOADING_TRIES = 100;
     /** Minimum initial space (in bytes) between loaded warriors */
     private final static int MIN_GAP = 1024;
+
+    private final Feature[] features;
 
     /** Warriors in the fight */
     private Warrior[] m_warriors;
@@ -86,8 +90,8 @@ public class War {
      * Constructor.
      * Fills the Arena with its initial data. 
      */
-    public War(MemoryEventListener memoryListener, CompetitionEventListener warListener, boolean startPaused, boolean useNewMemory) {
-    	isPaused = startPaused; //startPaused; // startPause just causes control to  return after startWar, we don't want to pause the first round
+    public War(MemoryEventListener memoryListener, CompetitionEventListener warListener, boolean startPaused, boolean useNewMemory, Feature[] features) {
+    	isPaused = startPaused; // startPause just causes control to  return after startWar, we don't want to pause the first round
         m_warListener = warListener;
         m_warriors = new Warrior[MAX_WARRIORS];
         m_numWarriors = 0;
@@ -95,6 +99,7 @@ public class War {
         m_core = new RawMemory(MEMORY_SIZE);
         m_nextFreeAddress = ARENA_SIZE;
         this.useNewMemory = useNewMemory;
+        this.features = features;
 
         // initialize arena
         for (int offset = 0; offset < ARENA_SIZE; ++offset) {

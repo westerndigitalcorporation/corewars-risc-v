@@ -3,10 +3,7 @@ package il.co.codeguru.corewars_riscv.war;
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuRiscV;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
-import il.co.codeguru.corewars_riscv.memory.Memory;
-import il.co.codeguru.corewars_riscv.memory.MemoryException;
-import il.co.codeguru.corewars_riscv.memory.MemoryRegion;
-import il.co.codeguru.corewars_riscv.memory.RestrictedMemory;
+import il.co.codeguru.corewars_riscv.memory.*;
 
 import static il.co.codeguru.corewars_riscv.war.War.*;
 
@@ -21,6 +18,7 @@ public class Warrior
     public MemoryRegion stackRegion;
     public MemoryRegion sharedRegion;
     public final MemoryRegion arenaRegion = new MemoryRegion(0, ARENA_SIZE -1);
+    private final MemoryBus bus = new MemoryBus();
 
     /**
      * Constructor.
@@ -182,4 +180,8 @@ public class Warrior
     private boolean m_isAlive;
 
     public final int m_myIndex; // in the War m_warriors array. used for identifying breakpoints
+
+    public MemoryBus getBus() {
+        return bus;
+    }
 }

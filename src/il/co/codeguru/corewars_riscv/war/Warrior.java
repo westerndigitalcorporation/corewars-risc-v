@@ -15,8 +15,6 @@ import static il.co.codeguru.corewars_riscv.war.War.*;
  */
 public class Warrior
 {
-    public MemoryRegion stackRegion;
-    public MemoryRegion sharedRegion;
     public final MemoryRegion arenaRegion = new MemoryRegion(0, ARENA_SIZE -1);
     private final MemoryBus bus = new MemoryBus();
     private int teamId;
@@ -28,8 +26,6 @@ public class Warrior
      * @param teamId
      * @param core              Real mode memory used as core.
      * @param loadAddress       Warrior's load address in the core (initial CS:IP).
-     * @param initialStack      Warrior's private stack in the core (initial SS:SP).
-     * @param groupSharedMemory Warrior group's shared memroy address (initial ES).
      */
     public Warrior(
             String name,
@@ -38,8 +34,6 @@ public class Warrior
             int teamId,
             Memory core,
             int loadAddress,
-            int initialStack,
-            int groupSharedMemory,
             int myIndex)
     {
         m_label = label;  // this comes from Code label
@@ -51,9 +45,6 @@ public class Warrior
 
         m_state = new CpuStateRiscV();
         initializeCpuState(loadAddress);
-
-        stackRegion = new MemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
-        sharedRegion = new MemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
 
         bus.addRegion(arenaRegion, core);
 

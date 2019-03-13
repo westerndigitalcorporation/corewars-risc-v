@@ -23,16 +23,10 @@ import static il.co.codeguru.corewars_riscv.memory.RawMemory.*;
  * @author DL
  */
 public class War {
-    /** Arena's code segment */
-    public final static short ARENA_SEGMENT = 0;
 
     /** Arena's size in bytes (= size of a single segment) */
     public final static int ARENA_SIZE =
         PARAGRAPHS_IN_SEGMENT * PARAGRAPH_SIZE;
-    /** Warrior's private stack size */
-    public final static short STACK_SIZE = 2*1024;
-    /** Group-shared private memory size */
-    public final static short GROUP_SHARED_MEMORY_SIZE = 1024;
     /** Arena is filled with this byte */
     private final static byte ARENA_BYTE = (byte)0x00;
     /** Maximum number of warriors in a fight */
@@ -50,11 +44,6 @@ public class War {
     private int m_numWarriors;
     /** Number of warriors still alive */
     private int m_numWarriorsAlive;
-    /**
-     * Addresses equal or larger than this are still unused.
-     * An address can be 'used' either by the Arena, or by the private stacks.
-     */
-    private int m_nextFreeAddress;
     /** The 'physical' memory core */
     private RawMemory m_core;
 
@@ -67,7 +56,6 @@ public class War {
     private IBreakpointCheck m_breakpointCheck = null;
     private int m_uiWarriorIndex = -1; // break in breakpoints only of this warrior (he's the one selected in the PlayersPanel)
     private boolean m_hasEnded = false; // this war has ended but the object remains alive for post-mortem examination
-    private boolean useNewMemory;
 
     public void setUiWarrior(Warrior warrior) {
         if (warrior != null)
@@ -89,15 +77,17 @@ public class War {
      * Constructor.
      * Fills the Arena with its initial data. 
      */
-    public War(MemoryEventListener memoryListener, CompetitionEventListener warListener, boolean startPaused, boolean useNewMemory, Feature[] features) {
+    public War(MemoryEventListener memoryListener, CompetitionEventListener warListener, boolean startPaused, Feature[] features) {
     	isPaused = startPaused; // startPause just causes control to  return after startWar, we don't want to pause the first round
         m_warListener = warListener;
         m_warriors = new Warrior[MAX_WARRIORS];
         m_numWarriors = 0;
         m_numWarriorsAlive = 0;
         m_core = new CyclicRawMemory(MEMORY_SIZE);
-        m_nextFreeAddress = ARENA_SIZE;
-        this.useNewMemory = useNewMemory;
+        /**
+         * Addresses equal or larger than this are still unused.
+         * An address can be 'used' either by the Arena, or by the private stacks.
+         */
         this.features = features;
 
         // initialize arena
@@ -261,8 +251,6 @@ public class War {
     private void loadWarriorGroup(WarriorGroup warriorGroup, int teamId) throws Exception {
         List<WarriorData> warriors = warriorGroup.getWarriors();
 
-        int groupSharedMemory = allocateCoreMemory(GROUP_SHARED_MEMORY_SIZE);
-
         for (WarriorData warrior : warriors) {
             String warriorName = warrior.getName();
             byte[] warriorData = warrior.getCode();
@@ -273,8 +261,6 @@ public class War {
             else
                 loadOffset = (short) warrior.m_debugFixedLoadAddress;
 
-            int stackMemory = allocateCoreMemory(STACK_SIZE);
-
             Warrior w = new Warrior(
                     warriorName,
                     warrior.getLabel(),
@@ -282,8 +268,6 @@ public class War {
                     teamId,
                     m_core,
                     loadOffset,
-                    stackMemory,
-                    groupSharedMemory,
                     m_numWarriors
             );
             m_warriors[m_numWarriors++] = w;
@@ -307,25 +291,6 @@ public class War {
     }
 
     /**
-     * Virtually allocates core memory of a given size, by advancing the
-     * next-free-memory pointer (m_nextFreeAddress).
-     * 
-     * @param size   Required memory size, must be a multiple of
-     *               RawMemory.PARAGRAPH_SIZE
-     * @return Pointer to the beginning of the allocated memory block.
-     */
-    private int allocateCoreMemory(short size) {
-        if ((size % PARAGRAPH_SIZE) != 0) {
-            throw new IllegalArgumentException();
-        }
-        int allocatedMemory = m_nextFreeAddress;
-
-        m_nextFreeAddress += size;
-
-        return allocatedMemory;
-    }
-	
-    /**
      * Returns a suitable random address to which a warrior with a given code
      * size can be loaded.
      * 
@@ -335,9 +300,8 @@ public class War {
      * 
      * @param warriorSize   Code size of the loaded warrior. 
      * @return offset within the Arena to which the warrior can be loaded.
-     * @throws Exception if no suitable address could be found.
      */
-    private short getLoadOffset(int warriorSize) throws Exception {
+    private short getLoadOffset(int warriorSize) {
         int loadAddress = 0;
         boolean found = false;
         int numTries = 0;

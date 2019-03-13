@@ -28,6 +28,6 @@ public class MemoryRegion {
     }
 
     public int getSize() {
-        return m_end - m_start;
+        return m_end - m_start + 1;
     }
 }

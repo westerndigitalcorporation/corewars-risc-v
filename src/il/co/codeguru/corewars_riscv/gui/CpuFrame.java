@@ -3,6 +3,7 @@ package il.co.codeguru.corewars_riscv.gui;
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
 import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
+import il.co.codeguru.corewars_riscv.features.NewMemory;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.gui.widgets.Console;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
@@ -330,8 +331,8 @@ public class CpuFrame implements CompetitionEventListener, MemoryEventListener {
 
 		Warrior warrior = currentWar.getWarriorByLabel(m_currentWarriorLabel);
 
-		stackView.initMemRegion(warrior.stackRegion, currentWar.getMemory(), force);
-		sharedMemView.initMemRegion(warrior.sharedRegion, currentWar.getMemory(), force);
+		stackView.initMemRegion(NewMemory.StackMemory, warrior.getBus(), force);
+		sharedMemView.initMemRegion(NewMemory.SharedMemory,  warrior.getBus(), force);
 
 		m_stateAccess.Memory = currentWar.getMemory();
 	}

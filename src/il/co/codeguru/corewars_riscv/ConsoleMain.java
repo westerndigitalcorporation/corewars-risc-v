@@ -70,7 +70,6 @@ public class ConsoleMain {
                 100,
                 competition.getWarriorRepository().getNumberOfGroups(),
                 false,
-                config.getProperty("NEW_MEMORY", "false").equals("true"),
                 features.getEnabledFeatures()
         );
         return competition;

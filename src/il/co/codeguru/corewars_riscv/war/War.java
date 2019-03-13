@@ -2,12 +2,11 @@ package il.co.codeguru.corewars_riscv.war;
 
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
 import il.co.codeguru.corewars_riscv.features.Feature;
-import il.co.codeguru.corewars_riscv.features.FeatureSet;
+import il.co.codeguru.corewars_riscv.memory.CyclicRawMemory;
 import il.co.codeguru.corewars_riscv.memory.RawMemory;
 import il.co.codeguru.corewars_riscv.gui.IBreakpointCheck;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
-import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.utils.Unsigned;
 
 import java.util.ArrayList;
@@ -96,7 +95,7 @@ public class War {
         m_warriors = new Warrior[MAX_WARRIORS];
         m_numWarriors = 0;
         m_numWarriorsAlive = 0;
-        m_core = new RawMemory(MEMORY_SIZE);
+        m_core = new CyclicRawMemory(MEMORY_SIZE);
         m_nextFreeAddress = ARENA_SIZE;
         this.useNewMemory = useNewMemory;
         this.features = features;
@@ -241,18 +240,25 @@ public class War {
      */
     public void loadWarriorGroups(WarriorGroup[] warriorGroups) throws Exception {
         m_currentWarrior = 0;
+        int currentTeamId = 0;
         ArrayList<WarriorGroup> groupsLeftToLoad = new ArrayList<>(Arrays.asList(warriorGroups));
 
         while (groupsLeftToLoad.size() > 0)
         {
             int randomInt = rand.nextInt(groupsLeftToLoad.size());
-            loadWarriorGroup(groupsLeftToLoad.get(randomInt));
+            loadWarriorGroup(groupsLeftToLoad.get(randomInt), currentTeamId);
+            currentTeamId++;
             groupsLeftToLoad.remove(randomInt);
         }
+
+        for(Feature feature : this.features) {
+            feature.initWarriorGroup(this.m_warriors);
+        }
+
         m_currentWarrior = -1;
     }
 
-    private void loadWarriorGroup(WarriorGroup warriorGroup) throws Exception {
+    private void loadWarriorGroup(WarriorGroup warriorGroup, int teamId) throws Exception {
         List<WarriorData> warriors = warriorGroup.getWarriors();
 
         int groupSharedMemory = allocateCoreMemory(GROUP_SHARED_MEMORY_SIZE);
@@ -273,12 +279,13 @@ public class War {
                     warriorName,
                     warrior.getLabel(),
                     warriorData.length,
+                    teamId,
                     m_core,
                     loadOffset,
                     stackMemory,
                     groupSharedMemory,
-                    m_numWarriors,
-                    useNewMemory);
+                    m_numWarriors
+            );
             m_warriors[m_numWarriors++] = w;
 
             // load warrior to arena

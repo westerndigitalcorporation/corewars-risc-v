@@ -26,4 +26,8 @@ public class MemoryRegion {
     public boolean equals(MemoryRegion a) {
         return m_start == a.m_start && m_end == a.m_end;
     }
+
+    public int getSize() {
+        return m_end - m_start;
+    }
 }

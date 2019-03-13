@@ -19,12 +19,13 @@ public class Warrior
     public MemoryRegion sharedRegion;
     public final MemoryRegion arenaRegion = new MemoryRegion(0, ARENA_SIZE -1);
     private final MemoryBus bus = new MemoryBus();
+    private int teamId;
 
     /**
      * Constructor.
-     * 
-     * @param name	            Warrior's name.
+     *  @param name                Warrior's name.
      * @param codeSize          Warrior's code size.
+     * @param teamId
      * @param core              Real mode memory used as core.
      * @param loadAddress       Warrior's load address in the core (initial CS:IP).
      * @param initialStack      Warrior's private stack in the core (initial SS:SP).
@@ -34,30 +35,29 @@ public class Warrior
             String name,
             String label,
             int codeSize,
+            int teamId,
             Memory core,
             int loadAddress,
             int initialStack,
             int groupSharedMemory,
-            int myIndex,
-            boolean useNewMemory)
+            int myIndex)
     {
         m_label = label;  // this comes from Code label
         m_name = name;
         m_codeSize = codeSize;
         m_loadAddress = loadAddress;
+        this.teamId = teamId;
         m_myIndex = myIndex;
 
         m_state = new CpuStateRiscV();
-        initializeCpuState(loadAddress, initialStack, groupSharedMemory, useNewMemory);
+        initializeCpuState(loadAddress);
 
         stackRegion = new MemoryRegion(initialStack, initialStack + STACK_SIZE - 1);
         sharedRegion = new MemoryRegion(groupSharedMemory, groupSharedMemory + GROUP_SHARED_MEMORY_SIZE - 1);
 
-        RestrictedMemory memory = new RestrictedMemory(core, new MemoryRegion[]{
-                sharedRegion, stackRegion, arenaRegion
-        }, useNewMemory);
+        bus.addRegion(arenaRegion, core);
 
-        m_cpu = new CpuRiscV(m_state, memory);
+        m_cpu = new CpuRiscV(m_state, bus);
 
         m_isAlive = true;		
     }
@@ -139,26 +139,13 @@ public class Warrior
      *  x3 - The shared memory between the players in the team
      *
      * @param loadAddress       Warrior's load address in the core.
-     * @param initialStack      Warrior's private stack.
-     * @param groupSharedMemory The warrior's group shared memory.
      */
-    private void initializeCpuState(
-        int loadAddress,
-        int initialStack,
-        int groupSharedMemory,
-        boolean useNewMemory) {
-
+    private void initializeCpuState(int loadAddress) {
         int loadIndex = (loadAddress) & 0xFFFF;
 
         // initialize registers
         m_state.setPc(loadIndex);
         m_state.setReg(1, loadIndex);
-        if(useNewMemory) {
-            m_state.setReg(2, initialStack + STACK_SIZE - 1);
-            m_state.setReg(3, groupSharedMemory);
-        }
-
-
     }
     
     public CpuStateRiscV getCpuState(){
@@ -183,5 +170,9 @@ public class Warrior
 
     public MemoryBus getBus() {
         return bus;
+    }
+
+    public int getTeamId() {
+        return teamId;
     }
 }

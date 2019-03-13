@@ -1,6 +1,6 @@
 package il.co.codeguru.corewars_riscv.memory;
-
-import javafx.util.Pair;
+import il.co.codeguru.corewars_riscv.utils.Logger;
+import il.co.codeguru.corewars_riscv.utils.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +11,14 @@ public class MemoryBus extends Memory {
     private List<Pair<MemoryRegion, Memory>> regions = new ArrayList<>();
 
     private Pair<MemoryRegion, Memory> findRegion(int index) {
-        for (var region : regions) {
+        for (Pair<MemoryRegion, Memory> region : regions) {
             if (region.getKey().isInRegion(index)) {
                 return region;
             }
+        }
+        //If there is only arena, return it and make it cyclic
+        if(regions.size() == 1) {
+            return regions.get(0);
         }
         return null;
     }
@@ -25,7 +29,7 @@ public class MemoryBus extends Memory {
 
     @Override
     public void storeByte(int index, byte value) throws MemoryException {
-        var region = findRegion(index);
+        Pair<MemoryRegion, Memory> region = findRegion(index);
         if(region == null) {
             throw new MemoryException("Write at forbidden location - at " + hex(index));
         }
@@ -34,7 +38,7 @@ public class MemoryBus extends Memory {
 
     @Override
     public byte loadByte(int index) throws MemoryException {
-        var region = findRegion(index);
+        Pair<MemoryRegion, Memory> region = findRegion(index);
         if(region == null) {
             throw new MemoryException("Read at forbidden location - at " + hex(index));
         }

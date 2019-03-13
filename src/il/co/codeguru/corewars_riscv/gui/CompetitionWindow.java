@@ -224,7 +224,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         }
 
         try {
-            competition.runCompetition(battlesPerGroup, numOfGroups, isInDebug, false, FeatureSet.getAllFeatures().getEnabledFeatures());
+            competition.runCompetition(battlesPerGroup, numOfGroups, isInDebug, false, SettingsPanel.getEnabledOptions().getEnabledFeatures());
             startRunAnimation(); // when runWar() returns we want the War object to be already constructured and ready
             if (this.isInDebug) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();

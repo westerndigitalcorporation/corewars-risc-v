@@ -9,10 +9,9 @@ import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.Instruc
 import il.co.codeguru.corewars_riscv.features.Syscall;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
-import il.co.codeguru.corewars_riscv.utils.Logger;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CpuRiscV {
 
@@ -21,7 +20,7 @@ public class CpuRiscV {
     private InstructionDecoder32I decoder;
     private InstructionDecoderRv32c cDecoder;
     private InstructionRunner32I runner;
-    private List<Syscall> syscalls = new ArrayList<>();
+    private Map<Integer, Syscall> syscalls = new HashMap<>();
 
     public CpuStateRiscV getState() {
         return state;
@@ -69,7 +68,7 @@ public class CpuRiscV {
     }
 
     public void registerSyscall(int id, Syscall syscall) {
-        this.syscalls.add(id, syscall);
+        this.syscalls.put(id, syscall);
     }
 
     public void callSyscall(int id) {

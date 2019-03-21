@@ -4,7 +4,6 @@ import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryBus;
 import il.co.codeguru.corewars_riscv.memory.MemoryRegion;
 import il.co.codeguru.corewars_riscv.memory.RawMemory;
-import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.Warrior;
 
 import java.util.HashMap;
@@ -29,7 +28,6 @@ public class NewMemory extends Feature {
 
                 warrior.getCpuState().setReg(2, StackMemory.m_start);
                 warrior.getCpuState().setReg(3, SharedMemory.m_start);
-
             }
         }
     }

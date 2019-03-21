@@ -23,6 +23,7 @@ public final class RV32I {
         public static final int LUI = 0x37;
         public static final int JALR = 0x67;
         public static final int JAL = 0x6f;
+        public static final int SYS = 0x73;
     }
 
     public static final class Opcodes{
@@ -74,6 +75,9 @@ public final class RV32I {
         public static Instruction.InstructionInfo Auipc= new Instruction.InstructionInfo("Auipc",OpcodeTypes.AUIPC);
         public static Instruction.InstructionInfo Jal  = new Instruction.InstructionInfo("Jal",OpcodeTypes.JAL);
         public static Instruction.InstructionInfo Jalr = new Instruction.InstructionInfo("Jalr",OpcodeTypes.JALR);
+
+        //System
+        public static Instruction.InstructionInfo Ecall= new Instruction.InstructionInfo("Ecall",OpcodeTypes.SYS, 0);
     }
 
 }

@@ -5,15 +5,18 @@ import il.co.codeguru.corewars_riscv.cpu.riscv.CpuStateRiscV;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.*;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 
 public class InstructionRunner32I {
 
+    private CpuRiscV cpu;
     private CpuStateRiscV state;
     private Memory memory;
 
     public InstructionRunner32I(CpuRiscV cpu) {
         this.state = cpu.getState();
         this.memory = cpu.getMemory();
+        this.cpu = cpu;
     }
 
     /**
@@ -314,6 +317,10 @@ public class InstructionRunner32I {
         if (state.getReg(i.getRs1()) + 0x80000000 >= state.getReg(i.getRs2()) + 0x80000000) jump(state, i.getImm());
     }
 
+
+    void ecall(InstructionFormatI i) {
+        cpu.callSyscall(state.getReg(8));
+    }
 
     private void jump(CpuStateRiscV state, int immediate, int instructionSize) {
         state.setPc(state.getPc() + immediate - instructionSize);

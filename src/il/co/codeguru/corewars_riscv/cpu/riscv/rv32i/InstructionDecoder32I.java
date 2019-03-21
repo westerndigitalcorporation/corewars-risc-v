@@ -27,12 +27,27 @@ public class InstructionDecoder32I {
                         (InstructionFormatBase format, InstructionRunner32I runner) -> runner.lui(new InstructionFormatU(format)));
             case RV32I.OpcodeTypes.BRANCH:
                 return branchOpcode(i);
+            case RV32I.OpcodeTypes.SYS:
+                return sysOpcode(i);
             case RV32I.OpcodeTypes.JALR:
                 return new Instruction(RV32I.Opcodes.Jalr, new InstructionFormatI(i),
                         (InstructionFormatBase format, InstructionRunner32I runner) -> runner.jalr(new InstructionFormatI(format)));
             case RV32I.OpcodeTypes.JAL:
                 return new Instruction(RV32I.Opcodes.Jal, new InstructionFormatUJ(i),
                         (InstructionFormatBase format, InstructionRunner32I runner) -> runner.jal(new InstructionFormatUJ(format)));
+            default:
+                throw new InvalidOpcodeException();
+        }
+    }
+
+    private Instruction sysOpcode(InstructionFormatBase i) throws  InvalidOpcodeException {
+        InstructionFormatI ii = new InstructionFormatI(i);
+        switch(ii.getFunct3()) {
+            case 0:
+                if(ii.getImmediate() == 0) {
+                    return new Instruction(RV32I.Opcodes.Ecall, ii,
+                            (InstructionFormatBase format, InstructionRunner32I runner) -> runner.ecall(new InstructionFormatI(format)));
+                }
             default:
                 throw new InvalidOpcodeException();
         }

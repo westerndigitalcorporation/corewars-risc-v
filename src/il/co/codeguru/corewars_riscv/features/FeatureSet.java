@@ -31,6 +31,7 @@ public class FeatureSet {
     public static FeatureSet getAllFeatures() {
         FeatureSet ans = new FeatureSet();
         ans.register("new-memory", new NewMemory());
+        ans.register("push-pop-all", new PushPopAll());
         return ans;
     }
 }

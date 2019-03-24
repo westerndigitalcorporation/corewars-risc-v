@@ -12,9 +12,13 @@ public class PushPopAll extends Feature {
         for (Warrior warrior : warriors) {
             if (warrior != null) {
                 warrior.getCpu().registerSyscall(3, new PushAll());
+                warrior.getCpu().registerSyscall(4, new PopAll());
             }
         }
     }
+
+    // TODO: This is not really appropiate as a syscall, more as a command.
+    // In the future, there is a need to make this a RISC-V command under the CG extension.
 
     private class PushAll extends Syscall {
 
@@ -28,12 +32,24 @@ public class PushPopAll extends Feature {
 
             Memory memory = cpuRiscV.getMemory();
             CpuStateRiscV state = cpuRiscV.getState();
-            for (int i = 1; i < 32; i++) {
+            for (int i = 3; i < 32; i++) {
                 memory.storeWord(state.getReg(2), state.getReg(i));
                 state.setReg(2, state.getReg(2) + 4);
             }
 
             remainingUses--;
+        }
+    }
+
+    private class PopAll extends Syscall {
+        @Override
+        public void call(CpuRiscV cpuRiscV) {
+            Memory memory = cpuRiscV.getMemory();
+            CpuStateRiscV state = cpuRiscV.getState();
+            for (int i = 3; i < 32; i++) {
+                state.setReg(i, memory.loadWord(state.getReg(2)));
+                state.setReg(2, state.getReg(2) + 4);
+            }
         }
     }
 }

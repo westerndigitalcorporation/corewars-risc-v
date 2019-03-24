@@ -31,6 +31,7 @@ public class FeatureSet {
     public static FeatureSet getAllFeatures() {
         FeatureSet ans = new FeatureSet();
         ans.register("new-memory", new NewMemory());
+        ans.register("bomb", new Bomb());
         return ans;
     }
 }

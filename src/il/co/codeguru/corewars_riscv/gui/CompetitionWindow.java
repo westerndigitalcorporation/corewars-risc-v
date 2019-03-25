@@ -2,6 +2,7 @@ package il.co.codeguru.corewars_riscv.gui;
 
 import elemental2.dom.DomGlobal;
 import elemental2.dom.HTMLElement;
+import il.co.codeguru.corewars_riscv.features.FeatureSet;
 import il.co.codeguru.corewars_riscv.gui.code_editor.CodeEditor;
 import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.*;
@@ -67,7 +68,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         warCounterDisplay = new JLabel("");
         buttonPanel.add(warCounterDisplay);
         buttonPanel.add(Box.createHorizontalStrut(30));
-        
+
         controlArea.add(buttonPanel);
         // -------------
         controlArea.add(new JSeparator(JSeparator.HORIZONTAL));
@@ -75,7 +76,6 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         JPanel controlPanel = new JPanel();
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(new JLabel("Survivor groups per session:"));
-
         controlPanel.add(new JLabel("Sessions per groups combination:"));
 		battlesPerGroupField = new JTextField("battlesPerGroupField", "100", 4);
 		seed = new JTextField("seed", null, 4);
@@ -84,7 +84,6 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
 		controlPanel.add(seed);
 		
 		controlArea.add(controlPanel);
-        
         // ------------
         getContentPane().add(controlArea, BorderLayout.SOUTH);
 
@@ -97,7 +96,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         setPlatform("riscv");
 
         stepnum = (HTMLElement) DomGlobal.document.getElementById("stepnum");
-
+        
         exportMethods();
 
         competition.competitionEventCaster.doneAdding();
@@ -223,7 +222,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         }
 
         try {
-            competition.runCompetition(battlesPerGroup, numOfGroups, isInDebug, SettingsPanel.useNewMemory());
+            competition.runCompetition(battlesPerGroup, numOfGroups, isInDebug, SettingsPanel.getEnabledOptions().getEnabledFeatures());
             startRunAnimation(); // when runWar() returns we want the War object to be already constructured and ready
             if (this.isInDebug) { // add breakpointchecked only if we're in debugger
                 War war = competition.getCurrentWar();

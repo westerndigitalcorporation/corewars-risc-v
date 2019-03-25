@@ -1,11 +1,12 @@
-package il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats;
+package il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats;
 
 import il.co.codeguru.corewars_riscv.cpu.riscv.Instruction;
+import il.co.codeguru.corewars_riscv.cpu.riscv.InstructionFormat;
 
-public class InstructionFormatBase {
+public class InstructionFormatBase implements InstructionFormat {
     final protected int raw;
 
-    public InstructionFormatBase(int raw) {
+    public InstructionFormatBase(Integer raw) {
         this.raw = raw;
     }
 

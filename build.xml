@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <project xmlns:ivy="antlib:org.apache.ivy.ant"
          xmlns:jacoco="antlib:org.jacoco.ant"
-         xmlns:sonar="antlib:org.sonar.ant"
          name="codewars_riscv" default="build" basedir=".">
 
   <!-- Arguments to gwtc and devmode targets -->
@@ -164,12 +163,13 @@
     </jacoco:report>
   </target>
 
-  <target name="sonar" depends="resolve">
-    <taskdef uri="antlib:org.sonar.ant" resource="org/sonar/ant/antlib.xml" classpathref="build.path"/>
-
-    <ivy:cachepath pathid="sonar.libraries" conf="compile"/>
-
-    <sonar:sonar xmlns:sonar="antlib:org.sonar.ant"/>
+  <target name="gen">
+    <junitreport todir="${junit.reports.dir}">
+      <fileset dir="${junit.reports.dir}">
+        <include name="**/TEST-*.xml"/>
+      </fileset>
+      <report format="frames" todir="${reports.dir}/html"/>
+    </junitreport>
   </target>
 
   <target name="build" depends="gwtc" description="Build this project" />

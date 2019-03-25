@@ -1,24 +1,30 @@
 package il.co.codeguru.corewars_riscv;
 
+import il.co.codeguru.corewars_riscv.features.Feature;
+import il.co.codeguru.corewars_riscv.features.FeatureSet;
 import il.co.codeguru.corewars_riscv.gui.PlayersPanel;
-import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.war.Competition;
 import il.co.codeguru.corewars_riscv.war.WarriorGroup;
 import il.co.codeguru.corewars_riscv.war.WarriorRepository;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 public class ConsoleMain {
     public static void main(String[] args) {
         if (args.length < 1) {
-            System.out.println("Usage: " + System.getProperty("sun.java.command").split(" ")[0] + " path-to-warriors");
+            System.out.println("Usage: " + System.getProperty("sun.java.command").split(" ")[0] + " path-to-warriors" + "[--list-features]");
             System.exit(0);
         }
-        Logger.outputToStdout();
+
+        if(Arrays.asList(args).contains("--list-features")) {
+            for(Map.Entry<String, Feature> feature : FeatureSet.getAllFeatures().getRegisterdFeatures()) {
+                System.out.println(feature.getKey());
+            }
+            System.exit(0);
+        }
+
 
         Properties config = loadConfig("config.properties");
         List<PlayersPanel.Code> binaries = loadBinaryFiles(args[0]);
@@ -40,9 +46,6 @@ public class ConsoleMain {
             System.out.println(group.getName() + ":" + group.getGroupScore());
         }
 
-        System.out.println("Working Directory = " +
-                System.getProperty("user.dir"));
-
         outputRepoToFile(
                 competition.getWarriorRepository(),
                 config.getProperty("OUTPUT_FILE")
@@ -61,11 +64,16 @@ public class ConsoleMain {
         );
         if(!ok) throw new RuntimeException("Failed to load warriors");
 
+        FeatureSet features = FeatureSet.getAllFeatures();
+        features.getRegisterdFeatures().stream()
+                .filter(e -> config.getProperty(e.getKey(), "false").equals("true"))
+                .forEach(e -> e.getValue().enable());
+
         competition.runCompetition(
                 100,
                 competition.getWarriorRepository().getNumberOfGroups(),
                 false,
-                config.getProperty("NEW_MEMORY", "false").equals("true")
+                features.getEnabledFeatures()
         );
         return competition;
     }
@@ -84,7 +92,7 @@ public class ConsoleMain {
         File folder = new File(path);
         File[] teamDirList = folder.listFiles();
         if (teamDirList == null) {
-            System.out.println(path + " is not a valid path or doesn't exist");
+            System.err.println(path + " is not a valid path or doesn't exist");
             System.exit(1);
         }
         List<PlayersPanel.Code> ans = new ArrayList<>(teamDirList.length);
@@ -141,7 +149,7 @@ public class ConsoleMain {
         try {
             is = new FileInputStream(filename);
         } catch (FileNotFoundException ex) {
-            System.out.println("WARNING: Config not found!");
+            System.err.println("WARNING: Config not found!");
             return config;
         }
         try {

@@ -1,19 +1,26 @@
 package il.co.codeguru.corewars_riscv.cpu.riscv;
 
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.InstructionDecoderRv32c;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.InstructionDecoder32I;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.InstructionRunner32I;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars_riscv.features.Syscall;
 import il.co.codeguru.corewars_riscv.memory.Memory;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CpuRiscV {
 
     private CpuStateRiscV state;
     private Memory Memory;
-    private InstructionDecoder decoder;
+    private InstructionDecoder32I decoder;
     private InstructionDecoderRv32c cDecoder;
-    private InstructionRunner runner;
+    private InstructionRunner32I runner;
+    private Map<Integer, Syscall> syscalls = new HashMap<>();
 
     public CpuStateRiscV getState() {
         return state;
@@ -27,9 +34,9 @@ public class CpuRiscV {
     {
         this.state = state;
         this.Memory = Memory;
-        this.decoder = new InstructionDecoder();
+        this.decoder = new InstructionDecoder32I();
         this.cDecoder = new InstructionDecoderRv32c();
-        this.runner = new InstructionRunner(this);
+        this.runner = new InstructionRunner32I(this);
     }
 
     public void nextOpcode() throws CpuException, MemoryException
@@ -49,15 +56,23 @@ public class CpuRiscV {
 
     private boolean tryRv32cSet() throws CpuException, MemoryException
     {
-        short rawComppressedCode = Memory.loadHalfWord(state.getPc());
-        CInstructionFormatBase commpressedInstruction = new CInstructionFormatBase(rawComppressedCode);
-        Instruction i = cDecoder.decode(commpressedInstruction);
+        short rawCompressedCode = Memory.loadHalfWord(state.getPc());
+        CInstructionFormatBase compressedInstruction = new CInstructionFormatBase(rawCompressedCode);
+        Instruction i = cDecoder.decode(compressedInstruction);
         if(i!=null)
         {
             i.execute(runner);
             state.setPc(state.getPc() + 2);
         }
         return i!=null;
+    }
+
+    public void registerSyscall(int id, Syscall syscall) {
+        this.syscalls.put(id, syscall);
+    }
+
+    public void callSyscall(int id) {
+        this.syscalls.get(id).call(this);
     }
 
 }

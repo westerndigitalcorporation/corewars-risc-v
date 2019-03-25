@@ -1,6 +1,7 @@
 package il.co.codeguru.corewars_riscv.cpu.riscv;
 
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.*;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.RV32I;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.*;
 import il.co.codeguru.corewars_riscv.utils.Logger;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,7 @@ public class InstructionFormatTest {
 
     @Test
     public void testOpCodeIs7LSB() {
-        InstructionFormatBase a = new InstructionFormatBase((short) 0xFFFFFFFF);
+        InstructionFormatBase a = new InstructionFormatBase(0xFFFFFFFF);
         assertEquals(0x7F, a.getOpcode());
     }
 

@@ -96,9 +96,7 @@ public class CompetitionWindow extends JFrame implements ScoreEventListener, Com
         setPlatform("riscv");
 
         stepnum = (HTMLElement) DomGlobal.document.getElementById("stepnum");
-
-        SettingsPanel.addAllOptions();
-
+        
         exportMethods();
 
         competition.competitionEventCaster.doneAdding();

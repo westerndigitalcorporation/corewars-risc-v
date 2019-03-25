@@ -1,4 +1,4 @@
-package il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats;
+package il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats;
 
 import il.co.codeguru.corewars_riscv.cpu.riscv.Instruction;
 

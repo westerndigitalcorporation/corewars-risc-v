@@ -1,7 +1,8 @@
 package il.co.codeguru.corewars_riscv.cpu.riscv;
 
 import il.co.codeguru.corewars_riscv.cpu.exceptions.CpuException;
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.InstructionRunner32I;
 import il.co.codeguru.corewars_riscv.memory.MemoryException;
 
 public class Instruction {
@@ -28,14 +29,14 @@ public class Instruction {
         return instructionFormat;
     }
 
-    public void execute(InstructionRunner runner) throws CpuException, MemoryException
+    public void execute(InstructionRunner32I runner) throws CpuException, MemoryException
     {
         action.apply(instructionFormat, runner);
     }
 
     @FunctionalInterface
     public interface Action{
-        void apply(InstructionFormatBase i, InstructionRunner runner) throws CpuException, MemoryException;
+        void apply(InstructionFormatBase i, InstructionRunner32I runner) throws CpuException, MemoryException;
     }
 
     public static class InstructionInfo {

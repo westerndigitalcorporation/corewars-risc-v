@@ -10,7 +10,10 @@ import il.co.codeguru.corewars_riscv.gui.code_editor.asm_parsers.TextUtils;
 import il.co.codeguru.corewars_riscv.jsadd.Format;
 import il.co.codeguru.corewars_riscv.memory.MemoryEventListener;
 import il.co.codeguru.corewars_riscv.memory.MemoryRegion;
+import il.co.codeguru.corewars_riscv.utils.Logger;
 import il.co.codeguru.corewars_riscv.utils.Unsigned;
+
+import static il.co.codeguru.corewars_riscv.jsadd.Format.hex;
 
 public class MemRegionView implements MemoryEventListener
 {

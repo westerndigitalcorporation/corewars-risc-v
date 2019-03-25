@@ -8,7 +8,7 @@ public class RawMemory extends Memory {
         return data;
     }
 
-    private byte[] data;
+    protected byte[] data;
 
     public RawMemory(int size)
     {

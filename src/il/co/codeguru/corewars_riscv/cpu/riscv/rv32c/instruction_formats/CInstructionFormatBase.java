@@ -1,13 +1,15 @@
 package il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats;
 
 import il.co.codeguru.corewars_riscv.cpu.riscv.Instruction;
+import il.co.codeguru.corewars_riscv.cpu.riscv.InstructionFormat;
 
-public class CInstructionFormatBase {
+public class CInstructionFormatBase implements InstructionFormat {
     final protected short raw;
 
-    public CInstructionFormatBase(short raw) {
-        this.raw = raw;
+    public CInstructionFormatBase(Integer raw) {
+        this.raw = raw.shortValue();
     }
+    public CInstructionFormatBase(Short raw) {this.raw = raw;}
 
     protected static int mask(int len)
     {

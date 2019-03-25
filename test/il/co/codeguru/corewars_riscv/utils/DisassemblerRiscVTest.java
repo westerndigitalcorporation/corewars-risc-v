@@ -1,7 +1,7 @@
 package il.co.codeguru.corewars_riscv.utils;
 
-import il.co.codeguru.corewars_riscv.cpu.riscv.RV32I;
-import il.co.codeguru.corewars_riscv.cpu.riscv.instruction_formats.InstructionFormatBase;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.RV32I;
+import il.co.codeguru.corewars_riscv.cpu.riscv.rv32i.instruction_formats.InstructionFormatBase;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.RV32C;
 import il.co.codeguru.corewars_riscv.cpu.riscv.rv32c.instruction_formats.CInstructionFormatBase;
 import il.co.codeguru.corewars_riscv.utils.disassembler.DisassemblerRiscV;

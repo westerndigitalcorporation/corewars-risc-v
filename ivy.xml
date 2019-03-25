@@ -13,6 +13,9 @@
         <dependency org="com.google.gwt" name="gwt-dev" rev="2.8.2" conf="compile->default"/>
         <dependency org="javax.validation" name="validation-api" rev="1.0.0.GA" conf="compile->default"/>
         <dependency org="com.google.gwt" name="gwt-codeserver" rev="2.8.2" conf="compile->default"/>
+        <dependency org="xalan" name="xalan" rev="2.7.2" conf="compile->default"/>
+        <dependency org="xalan" name="serializer" rev="2.7.2" conf="compile->default"/>
+
 
         <dependency org="com.google.elemental2" name="elemental2-dom" rev="1.0.0-RC1" conf="compile->default"/>
         <dependency org="com.google.elemental2" name="elemental2-core" rev="1.0.0-RC1" conf="compile->default"/>
